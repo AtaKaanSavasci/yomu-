@@ -1,5 +1,13 @@
 # Doğrulama kaydı · 30 Ekim 2026
 
+## 0.2.1 · Alfabe akışı
+
+[Yeni alfabe geri bildirim ekranı](qa/alphabet-auto-flow.jpg): yanlış giriş aynı karakterde kalır; cevap açılmadan tekrar yazılabilir.
+
+33 otomatik test başarılı. Yeni altı test: kısmi yazım, doğru cevabın Enter olmadan ilerlemesi, yanlışta kalma ve tekrar deneme, boş Enter ile cevabı açıp ilerleme, son kartta cevabın korunması, eski/tekrarlanan giriş olaylarının sonraki soruyu cevaplamaması, Japonca yazma ve seçenekli soru davranışı.
+
+Gerçek uygulama içi tarayıcıda beş harflik tur denendi: yanlışta aynı kart kaldı; doğru girince 1/5 → 2/5 otomatik geçti; odak yeni cevap alanında kaldı; yenilemede konum korundu. Boş Enter ile kalan dört cevap açıldı ve özet 1/5 doğru + 4 gösterilen cevap olarak göründü. Ayrı turda beş cevap Enter olmadan doğru tamamlandı; sh başlangıcında yanlış mesajı çıkmadı, si varyantı kabul edildi. Katakana yazarak cevaplama ve seçenekli yanlış/doğru geçişi de doğrulandı. Fiziksel Japonca IME ile uçtan uca deneme yapılmadı; bileşim olayları değerlendirmede beklenir. Bu kontrol, 0.2 ekranlarının tümünün yeniden test edildiği anlamına gelmez.
+
 ## 0.2 güncellemesi
 
 **27 test başarılı**, uygulama ve sunucu JS dosyalarının tamamı sözdizimi kontrolünden geçti. Yeni testler: 46/71/104 kana kapsamı, satır filtresi, rastgele turun benzersiz soruları, üç egzersiz türü, tüm karakter soru kimliklerinin tekrar kuyruğunda çözülmesi, romaji alternatifleri, eski şema 1 kayıtlarının korunarak şema 2'ye taşınması, dört anime örneği, kişisel replik doğrulaması, altı çeviri yönü, UTF-8 sınırı, kota/yanlış yanıt/timeout/ağ hatası.

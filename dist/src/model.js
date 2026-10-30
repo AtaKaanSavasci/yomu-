@@ -29,11 +29,13 @@ export function normalizeAnswer(value, language) {
   // Kana/kanji are never romanized; only width, case, whitespace and terminal punctuation normalize.
   return String(value).normalize('NFKC').trim().replace(/[。.!！?？]+$/u, '').trim().replace(/\s+/gu, ' ').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US');
 }
-export function gradeAnswer(question, value, language) {
+export function normalizeQuestionAnswer(question, value, language) {
   const locale=question.normalization==='romaji'?'en':language;
-  const normalize=value=>normalizeAnswer(question.normalization==='romaji'?String(value).toLowerCase().replace(/[ōūāīē]/g,c=>({ō:'ou',ū:'uu',ā:'aa',ī:'ii',ē:'ee'}[c])):value,locale);
-  const normalized = normalize(value);
-  return question.answers[language].some(answer => normalize(answer) === normalized);
+  return normalizeAnswer(question.normalization==='romaji'?String(value).toLowerCase().replace(/[ōūāīē]/g,c=>({ō:'ou',ū:'uu',ā:'aa',ī:'ii',ē:'ee'}[c])):value,locale);
+}
+export function gradeAnswer(question, value, language) {
+  const normalized = normalizeQuestionAnswer(question,value,language);
+  return question.answers[language].some(answer => normalizeQuestionAnswer(question,answer,language) === normalized);
 }
 export const stateKey = (itemId, skill) => `${itemId}:${skill}`;
 export function schedule(previous, correct, now) {

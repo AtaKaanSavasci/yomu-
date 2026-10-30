@@ -78,5 +78,5 @@ export function getCharacterQuestion(id) {
 export function createCharacterSession(config, random=Math.random) {
  const pool=characterPool(config); if(!pool.length) throw new Error('EMPTY_POOL');
  const shuffled=[...pool];for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}
- return {ids:shuffled.slice(0,10).map(e=>characterQuestionId(e.id,config.mode)),index:0,eventIds:[],feedback:null,phase:'exercise',config:{script:config.script,level:config.level,mode:config.mode},startedAt:new Date().toISOString()};
+ return {id:crypto.randomUUID(),ids:shuffled.slice(0,10).map(e=>characterQuestionId(e.id,config.mode)),index:0,eventIds:[],feedback:null,phase:'exercise',wrongForCurrent:false,draft:'',config:{script:config.script,level:config.level,mode:config.mode},startedAt:new Date().toISOString()};
 }

@@ -5,6 +5,7 @@ import {defaultPractice,groupsFor,createCharacterSession,getCharacterQuestion} f
 import {animeQuotes,getAnimeQuestion,createCustomQuote} from './anime.js';
 import {hubPage,charactersPage,animePage,translationBox,translationOutput} from './practice-ui.js';
 import {mountClip} from './media.js';
+import {applyCharacterInput,classifyCharacterInput} from './character-flow.js';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -12,6 +13,8 @@ let state, busy = false, storageError = '', selectedWord = 'cafe', questionStart
 let clipCleanup=null;
 const translationDraft={source:'tr',target:'ja',text:'',result:'',error:'',busy:false,route:[]};
 let translationRequest=0,translationAbort;
+let pendingCharacterInput=null,processingCharacterInput=false;
+const composingCharacterInputs=new WeakSet();
 const T = (tr, en) => state?.settings.language === 'en' ? en : tr;
 const L = obj => obj[state.settings.language];
 const getQuestion=id=>getAnimeQuestion(id,state?.anime.customQuotes)||getContentQuestion(id);
@@ -57,7 +60,7 @@ async function commit(next, repaint = true) {
     storageError = e instanceof ConflictError ? T('Başka bir sekmede kayıt değişti. Devam etmek için sayfayı yenile.', 'Data changed in another tab. Reload to continue.') : T('Kayıt yapılamadı. Tarayıcı depolama alanını kontrol et; bu işlem kaydedilmedi.', 'Could not save. Check browser storage; this action was not saved.');
     showStorageError();
     return false;
-  } finally { busy = false; }
+  } finally { busy = false; void drainCharacterInput(); }
 }
 function showStorageError() {
   const banner = $('#storage-error');
@@ -256,6 +259,40 @@ async function answerNewExercise(form,kind) {
   nextSession.feedback=id;nextSession.eventIds.push(id);
   if(await commit(next))$('.feedback')?.focus();
 }
+function paintCharacterInput(form,kind) {
+ const wrong=kind==='incorrect',status=form.querySelector('#lab-live-status'),input=form.querySelector('input[type="text"],input:not([type])');
+ if(status){status.textContent=wrong?T('Yanlış. Aynı harfte tekrar dene.','Incorrect. Try this character again.'):'';status.classList.toggle('incorrect',wrong);}
+ input?.setAttribute('aria-invalid',String(wrong));
+}
+function queueCharacterInput(form,submitted=false) {
+ if(!form?.isConnected || !form.dataset.questionId)return;
+ const input=form.querySelector('.answer-input');if(input && composingCharacterInputs.has(input))return;
+ const answer=String(new FormData(form).get('answer') || '');
+ const question=getCharacterQuestion(form.dataset.questionId);if(!question)return;
+ paintCharacterInput(form,classifyCharacterInput(question,answer,state.settings.language,submitted));
+ pendingCharacterInput={form,answer,submitted,questionId:form.dataset.questionId,sessionId:form.dataset.sessionId};
+ void drainCharacterInput();
+}
+async function drainCharacterInput() {
+ if(busy || processingCharacterInput || !pendingCharacterInput)return;
+ processingCharacterInput=true;
+ try{
+  while(pendingCharacterInput && !busy){
+   const task=pendingCharacterInput;pendingCharacterInput=null;
+   if(!task.form.isConnected || route()!=='characters')continue;
+   const result=applyCharacterInput(state,task.answer,{submitted:task.submitted,questionId:task.questionId,sessionId:task.sessionId,elapsedMs:Math.min(600000,Math.round(performance.now()-questionStarted))});
+   if(result.kind==='stale')continue;
+   if(result.state===state)continue;
+   if(result.advanced)task.form.querySelectorAll('input,button').forEach(el=>{el.disabled=true;});
+   const saved=await commit(result.state,false);
+   if(!saved){if(task.form.isConnected)task.form.querySelectorAll('input,button').forEach(el=>{el.disabled=false;});continue;}
+   if(result.advanced){
+    questionStarted=performance.now();
+    if(route()==='characters'){render();const input=$('#lab-answer-input') || $('[data-form="lab-answer"] input[type="radio"]');if(input)input.focus({preventScroll:true});else if(state.practice.session?.phase==='done'){$('.practice-welcome h2')?.setAttribute('tabindex','-1');$('.practice-welcome h2')?.focus({preventScroll:true});}if(result.kind==='revealed')$('.character-result')?.scrollIntoView({block:'nearest'});}
+   }
+  }
+ }finally{processingCharacterInput=false;if(pendingCharacterInput&&!busy)void drainCharacterInput();}
+}
 async function advanceQuestion() {
   const next = structuredClone(state), session = next.session;
   if (session.mode === 'review') {
@@ -302,9 +339,9 @@ document.addEventListener('click', async e => {
   let next = structuredClone(state);
   if(action==='quick-script'||action==='lab-script'){next.practice.script=target.dataset.script;if(await commit(next,false)){if(action==='quick-script')navigate('characters');else render();}return;}
   if(action==='lab-all'||action==='lab-none'){next.practice.groups=action==='lab-all'?groupsFor(next.practice.level).map(g=>g.id):[];await commit(next);return;}
-  if(action==='lab-start'){try{next.practice.session=createCharacterSession(next.practice);if(await commit(next)){questionStarted=performance.now();$('.practice-stage')?.scrollIntoView({block:'start',behavior:'smooth'});}}catch{$('#lab-validation').textContent=T('En az bir satır seç.','Choose at least one row.');}return;}
+  if(action==='lab-start'){try{next.practice.session=createCharacterSession(next.practice);if(await commit(next)){questionStarted=performance.now();$('.practice-stage')?.scrollIntoView({block:'start',behavior:'smooth'});($('#lab-answer-input') || $('[data-form="lab-answer"] input[type="radio"]'))?.focus({preventScroll:true});}}catch{$('#lab-validation').textContent=T('En az bir satır seç.','Choose at least one row.');}return;}
   if(action==='lab-next'){const s=next.practice.session;if(!s?.feedback)return;s.index++;s.feedback=null;if(s.index>=s.ids.length)s.phase='done';if(await commit(next)){questionStarted=performance.now();$('.practice-stage')?.scrollIntoView({block:'start',behavior:'smooth'});}return;}
-  if(action==='lab-mistakes'){const s=next.practice.session;if(!s)return;const ids=[...new Set(state.events.filter(e=>s.eventIds.includes(e.id)&&!e.correct).map(e=>e.questionId))];if(!ids.length)return;next.practice.session={...s,ids,index:0,eventIds:[],feedback:null,phase:'exercise'};if(await commit(next))questionStarted=performance.now();return;}
+  if(action==='lab-mistakes'){const s=next.practice.session;if(!s)return;const ids=[...new Set(state.events.filter(e=>s.eventIds.includes(e.id)&&!e.correct).map(e=>e.questionId))];if(!ids.length)return;next.practice.session={...s,id:crypto.randomUUID(),ids,index:0,eventIds:[],feedback:null,phase:'exercise',wrongForCurrent:false,draft:'',lastResult:null};if(await commit(next)){questionStarted=performance.now();($('#lab-answer-input') || $('[data-form="lab-answer"] input[type="radio"]'))?.focus({preventScroll:true});}return;}
   if(action==='open-quote'||action==='select-quote'){next.anime.activeId=target.dataset.quote;next.anime.practice=null;if(action==='open-quote'){next.anime.level='all';next.anime.series='all';}if(await commit(next,false)){if(action==='open-quote')navigate('anime');else render();}return;}
   if(action==='anime-reset'){next.anime.level='all';next.anime.series='all';await commit(next);return;}
   if(action==='quote-practice'){next.anime.practice={quoteId:target.dataset.quote,eventIds:[],feedback:null};if(await commit(next)){questionStarted=performance.now();$('.quote-exercise')?.scrollIntoView({block:'start',behavior:'smooth'});}return;}
@@ -321,14 +358,21 @@ document.addEventListener('click', async e => {
   if (action === 'toggle-suspend') { const item = next.skillStates[target.dataset.key]; item.suspended = !item.suspended; await commit(next); }
 });
 document.addEventListener('change', async e => {
+  if(e.target.matches('[data-form="lab-answer"] input[type="radio"]')){queueCharacterInput(e.target.form);return;}
   if(e.target.closest('[data-form="translation"]')){if(['source','target'].includes(e.target.name)){invalidateTranslation();translationDraft[e.target.name]=e.target.value;if(translationDraft.source===translationDraft.target){const other=e.target.name==='source'?'target':'source';translationDraft[other]=['tr','ja','en'].find(l=>l!==e.target.value);}syncTranslation();}return;}
   if(e.target.dataset.lab){const key=e.target.dataset.lab,next=structuredClone(state);next.practice[key]=e.target.type==='checkbox'?e.target.checked:e.target.value;if(key==='level')next.practice.groups=groupsFor(e.target.value).map(g=>g.id);await commit(next);return;}
   if(e.target.dataset.kanaGroup){const id=e.target.dataset.kanaGroup,next=structuredClone(state);next.practice.groups=e.target.checked?[...new Set([...next.practice.groups,id])]:next.practice.groups.filter(g=>g!==id);await commit(next);return;}
   if(e.target.dataset.anime){const next=structuredClone(state);next.anime[e.target.dataset.anime]=e.target.value;next.anime.practice=null;await commit(next);return;}
   if (e.target.dataset.setting) { const key = e.target.dataset.setting; const next = structuredClone(state); next.settings[key] = e.target.checked; if (await commit(next)) $('[data-setting="' + key + '"]')?.focus({ preventScroll: true }); }
 });
-document.addEventListener('input',e=>{if(e.target.matches('[data-form="translation"] textarea')){invalidateTranslation();translationDraft.text=e.target.value;syncTranslation();}});
+document.addEventListener('input',e=>{
+ if(e.target.matches('[data-form="lab-answer"] .answer-input')){if(!e.isComposing)queueCharacterInput(e.target.form);return;}
+ if(e.target.matches('[data-form="translation"] textarea')){invalidateTranslation();translationDraft.text=e.target.value;syncTranslation();}
+});
+document.addEventListener('compositionstart',e=>{if(e.target.matches('[data-form="lab-answer"] .answer-input'))composingCharacterInputs.add(e.target);});
+document.addEventListener('compositionend',e=>{if(e.target.matches('[data-form="lab-answer"] .answer-input')){composingCharacterInputs.delete(e.target);queueCharacterInput(e.target.form);}});
 document.addEventListener('keydown', e => {
+  if(e.key==='Enter' && e.target.matches('[data-form="lab-answer"] .answer-input')){if(e.isComposing||e.keyCode===229||composingCharacterInputs.has(e.target))return;e.preventDefault();if(!e.repeat)queueCharacterInput(e.target.form,true);return;}
   if (e.isComposing || e.ctrlKey || e.altKey || e.metaKey || e.target.matches('input,textarea,select') || state.session?.feedback) return;
   if (/^[1-3]$/.test(e.key)) {
     const radio = document.querySelectorAll('.choices input')[Number(e.key)-1];
@@ -337,6 +381,7 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('submit', async e => {
   const form = e.target;
+  if(form.dataset.form==='lab-answer' && form.dataset.questionId){e.preventDefault();queueCharacterInput(form,true);return;}
   if(form.dataset.form==='translation'){e.preventDefault();await performTranslation(form);return;}
   if(['lab-answer','quote-answer'].includes(form.dataset.form)){e.preventDefault();await answerNewExercise(form,form.dataset.form);return;}
   if(form.id==='custom-quote-form'){

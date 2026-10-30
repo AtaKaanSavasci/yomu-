@@ -1,6 +1,6 @@
 # Yomu · Japonca çalışma alanı
 
-**0.2.0 · 30 Ekim 2026** — Hiragana, katakana ve kanji pratiği; anime replikleri; Türkçe/Japonca/İngilizce çeviri. İlk okuma ve tekrar prototipi korunarak çalışma alanı genişletildi.
+**0.2.1 · 30 Ekim 2026** — Hiragana, katakana ve kanji pratiği; anime replikleri; Türkçe/Japonca/İngilizce çeviri. İlk okuma ve tekrar prototipi korunarak çalışma alanı genişletildi.
 
 ## Çalıştırma
 
@@ -9,6 +9,14 @@ Node.js 22+ gerekir. Windows'ta **Yomu-baslat.cmd** dosyasını çift tıkla vey
 Önceden açılmış 0.1 sunucusu varsa önce o sunucuyu durdurup yeniden başlat: yeni çeviri API'si eski sunucuda bulunmaz. Başka bir port için PowerShell'de **$env:PORT = '4174'** ardından **npm start** kullanılabilir.
 
 Dil tercihi, ilerleme, cevaplar ve tekrarlar IndexedDB'de **aynı tarayıcı + aynı adres/port** için saklanır. Farklı portta önceki verilerin görünmemesi silindikleri anlamına gelmez. 0.1 kayıtları şema 2'ye eklemeli olarak taşınır; cevaplar korunur.
+
+## 0.2.1 · Enter gerektirmeyen alfabe pratiği
+
+Doğru cevap tamamlanınca otomatik sonraki karaktere geçilir ve cevap alanına odaklanılır. Yanlış cevapta aynı karakter kalır, “Yanlış” mesajı gösterilir; cevap açığa çıkmadan tekrar denenir. shi için sh gibi tamamlanmamış geçerli bir başlangıç yanlış sayılmaz. Boş alanda Enter, cevabı üstte gösterip sonraki karaktere geçer; bu işlem doğru cevap sayılmaz ve tekrar için kaydedilir. Son karakterde gösterilen cevap tur özetinde de görünür.
+
+Yanlış yazımı her tuşta ayrı deneme olarak kaydetmek yerine bir karakterdeki ilk yanlış kaydedilir; sonradan doğru tamamlamak ayrı cevap olayıdır. Tur özeti tamamlanan karakter sayısını esas alır. Japonca IME bileşimi bitmeden değerlendirme yapılmaz. Anime ve okuma derslerinin cevap akışı korunur.
+
+33 test ve bu akış için gerçek tarayıcı kontrolleri başarılı: [QA](docs/qa.md).
 
 ## Kullanım
 
@@ -53,7 +61,7 @@ Gün sınırı seçili IANA saat diliminde 00.00; aralık “1 gün” için ge�
 
 **npm ci**, **npm run check**, **npm test**: 27 test. Eski kayıtların taşınması, 208 kana varyantının soru çözümlemesi, bağlamlı kanji, cevap varyantları, anime/kullanıcı soruları, altı çeviri yönü ve hata/kota durumları dahil. [Doğrulama kaydı](docs/qa.md).
 
-0.2 ana sayfası, karakter seçim ekranı ve çeviri isteği gerçek tarayıcıda açıldı. Sonrasında Computer Use, Chrome adresini güvenilir biçimde doğrulayamadığı için durdu; yeni akışların tümü için mobil/görsel uçtan uca doğrulama tamamlanamadı. docs/qa içindeki mevcut görseller **0.1 sürümüne aittir**. Bu sınır yeni ekranların tamamı görsel olarak doğrulanmış gibi yorumlanmamalıdır.
+0.2 ana sayfası, karakter seçim ekranı ve çeviri isteği gerçek tarayıcıda açıldı. Sonrasında Computer Use, Chrome adresini güvenilir biçimde doğrulayamadığı için durdu; yeni akışların tümü için mobil/görsel uçtan uca doğrulama tamamlanamadı. docs/qa içindeki önceki üç görsel **0.1 sürümüne aittir**; alphabet-auto-flow.jpg, 0.2.1 alfabe geri bildirim ekranıdır. Bu sınır yeni ekranların tamamı görsel olarak doğrulanmış gibi yorumlanmamalıdır.
 
 Başlıca dosyalar: dist/src/characters.js, anime.js, practice-ui.js, media.js; önceki app.js/content.js/model.js/storage.js; scripts/translation.mjs; tests/practice.test.mjs ve translation.test.mjs.
 
