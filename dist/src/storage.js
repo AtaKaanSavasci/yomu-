@@ -1,4 +1,4 @@
-import { freshState } from './model.js';
+import { hydrateState } from './model.js';
 const DB_NAME = 'yomu-local-v1';
 let db;
 export class ConflictError extends Error {}
@@ -12,7 +12,7 @@ export async function openStore() {
   });
   return new Promise((resolve, reject) => {
     const request = db.transaction('app').objectStore('app').get('state');
-    request.onsuccess = () => resolve(request.result || freshState());
+    request.onsuccess = () => {try{resolve(hydrateState(request.result));}catch(e){reject(e);}};
     request.onerror = () => reject(request.error);
   });
 }

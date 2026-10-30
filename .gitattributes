@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.jpg -text
+*.cmd text eol=crlf
+docs/research/rapor.md -text
+docs/research/yorum-kanitlari.json -text

@@ -1,11 +1,19 @@
 import { CONTENT_VERSION } from './content.js';
-export const SCHEMA_VERSION = 1;
+import { defaultPractice } from './characters.js';
+export const SCHEMA_VERSION = 2;
 export const ALGORITHM_VERSION = 'fixed-interval-v1';
 export const SKILLS = ['meaning', 'reading', 'listening', 'writing'];
 export function freshState() {
   return { schemaVersion: SCHEMA_VERSION, contentVersion: CONTENT_VERSION, revision: 0,
     settings: { language: 'tr', goal: 'reading', level: 'kana', dailyMinutes: 10, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, largeText: false, furigana: true, explanations: true, translation: false, onboarded: false },
-    events: [], skillStates: {}, lessons: {}, issues: [], session: null };
+    events: [], skillStates: {}, lessons: {}, issues: [], session: null,
+    practice: defaultPractice(), anime: {level:'all',series:'all',activeId:'vinland-enemies',practice:null,customQuotes:[]} };
+}
+export function hydrateState(saved) {
+  if (!saved) return freshState();
+  if (saved.schemaVersion > SCHEMA_VERSION) throw new Error('Newer schema is not supported');
+  const defaults=freshState();
+  return {...defaults,...saved,schemaVersion:SCHEMA_VERSION,settings:{...defaults.settings,...saved.settings},practice:{...defaults.practice,...saved.practice},anime:{...defaults.anime,...saved.anime}};
 }
 export function dayKey(date, timeZone) {
   const parts = new Intl.DateTimeFormat('en', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date(date));
@@ -22,8 +30,10 @@ export function normalizeAnswer(value, language) {
   return String(value).normalize('NFKC').trim().replace(/[。.!！?？]+$/u, '').trim().replace(/\s+/gu, ' ').toLocaleLowerCase(language === 'tr' ? 'tr-TR' : 'en-US');
 }
 export function gradeAnswer(question, value, language) {
-  const normalized = normalizeAnswer(value, language);
-  return question.answers[language].some(answer => normalizeAnswer(answer, language) === normalized);
+  const locale=question.normalization==='romaji'?'en':language;
+  const normalize=value=>normalizeAnswer(question.normalization==='romaji'?String(value).toLowerCase().replace(/[ōūāīē]/g,c=>({ō:'ou',ū:'uu',ā:'aa',ī:'ii',ē:'ee'}[c])):value,locale);
+  const normalized = normalize(value);
+  return question.answers[language].some(answer => normalize(answer) === normalized);
 }
 export const stateKey = (itemId, skill) => `${itemId}:${skill}`;
 export function schedule(previous, correct, now) {
@@ -38,7 +48,7 @@ export function recordAnswer(state, question, answer, now = new Date(), id = cry
   const result = schedule(prev, correct, now);
   next.events.push({ id, questionId: question.id, itemId: question.itemId, skill: question.skill, answer, correct, language: state.settings.language,
     answeredAt: new Date(now).toISOString(), day: dayKey(now, state.settings.timezone), timezone: state.settings.timezone,
-    contentVersion: question.version, algorithmVersion: ALGORITHM_VERSION, elapsedMs, mode });
+    contentVersion: question.version, algorithmVersion: ALGORITHM_VERSION, elapsedMs, mode, responseType:question.responseType || (question.choices?'choice':'typed') });
   next.skillStates[key] = { ...prev, ...result, itemId: question.itemId, skill: question.skill, questionId: question.id, attempts: (prev?.attempts || 0) + 1,
     correct: (prev?.correct || 0) + Number(correct), lastAnsweredAt: new Date(now).toISOString(), suspended: false, source: 'answer' };
   return next;
