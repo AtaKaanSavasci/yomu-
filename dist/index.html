@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f2">
+  <meta name="description" content="Yomu: kısa Japonca metinler, bağlamlı açıklamalar ve kişisel tekrar. Yerel çalışma prototipi.">
+  <title>Yomu · Japonca çalışma alanı</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./src/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">İçeriğe geç / Skip to content</a>
+  <div id="app"><p class="loading">Yomu · 読む</p></div>
+  <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+  <dialog id="dialog"></dialog>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "researchDate": "2026-10-30",
+  "copiedOn": "2026-10-30",
+  "originalDirectory": "C:\\Users\\AtaK\\Documents\\Codex\\2026-10-29\\merh\\outputs\\japonca-pazar-arastirmasi",
+  "method": "Byte-for-byte copies; original last-write UTC timestamps retained. Research date taken from the documents, not the parent directory name.",
+  "files": [
+    {
+      "name": "rapor.md",
+      "sha256": "C72592E98EE7EF085E82273F7279DDF9CC895EFB51DB8DAE1CC8EB30747D556E",
+      "originalLastWriteTimeUtc": "2026-10-30T15:21:53.3058708Z"
+    },
+    {
+      "name": "yorum-kanitlari.json",
+      "sha256": "B932B33D0B1D5CD774DCAC4BEFF5350ACB1F08D633DAB0E23C86F9D50638FADC",
+      "originalLastWriteTimeUtc": "2026-10-30T15:15:19.1359813Z"
+    }
+  ],
+  "limitations": "14 products researched; 27 English Google Play cards from 9 products, 15 dated 2026. Small non-random sample; no complaint rate, market share, comparative learning experiment or reproduced-bug claim. Bunpro and Bunpo are distinct products."
+}
