@@ -1,5 +1,17 @@
 # Doğrulama kaydı · 30 Ekim 2026
 
+## 0.2 güncellemesi
+
+**27 test başarılı**, uygulama ve sunucu JS dosyalarının tamamı sözdizimi kontrolünden geçti. Yeni testler: 46/71/104 kana kapsamı, satır filtresi, rastgele turun benzersiz soruları, üç egzersiz türü, tüm karakter soru kimliklerinin tekrar kuyruğunda çözülmesi, romaji alternatifleri, eski şema 1 kayıtlarının korunarak şema 2'ye taşınması, dört anime örneği, kişisel replik doğrulaması, altı çeviri yönü, UTF-8 sınırı, kota/yanlış yanıt/timeout/ağ hatası.
+
+Gerçek tarayıcıda yeni ana sayfa, görünür çeviri masası, çeviri isteği ve karakter seçimi ekranı açıldı. Ardından Computer Use, Chrome'un geçerli URL'sini güvenilir şekilde doğrulayamadığı için tüm bilgisayar/tarayıcı kontrolü durduruldu. 0.2 için bütün tur akışları, gerçek embed oynatımı ve mobil/büyük yazı görsel doğrulaması tamamlanamadı. Aşağıdaki ekran görüntüleri ve ilk akış kontrolü **0.1 geçmiş kaydıdır**; 0.2 kanıtı olarak sunulmaz.
+
+HTTP üzerinden altı gerçek çeviri yönü denendi. Doğrudan TR↔JA sonuçlarında bariz kalite hatası bulundu; İngilizce ara dil eklenip bu iki yönde gerçek hizmet tekrar denendi. HTTP 200 yalnızca hizmet yanıtını kanıtlar; dil doğruluğu garanti edilmez. Örnek sonuçlar alıştırma anahtarına aktarılmadı. Kaynak ve sınırlar [sources-v02.md](sources-v02.md) dosyasında.
+
+GitHub hedefi kullanıcı tarafından sağlandı: [AtaKaanSavasci/yomu-](https://github.com/AtaKaanSavasci/yomu-). Depo oluşturma aracı olmadığı ve yerel Git kimliği bulunmadığı için oluşturma adımını kullanıcı yaptı; kaynak aktarımı bağlı GitHub araçlarıyla yürütülür. Systema deposuna dokunulmadı.
+
+## 0.1 tarihsel doğrulama
+
 Ortam: Windows, Node.js 26.11.1, npm 11.20.0; gerçek Chromium tabanlı uygulama içi tarayıcı. Aşağıdaki test kayıtları yalnızca bu inceleme sırasında üretilen yapay QA verileridir; ekran görüntülerindeki ilerleme gerçek kullanıcının öğrenme başarısı değildir.
 
 ## Otomatik kontroller

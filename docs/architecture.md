@@ -1,5 +1,13 @@
 # Mimari ve tekrar kararı · 30 Ekim 2026
 
+## 0.2 ekleri
+
+Önceki kararların tarihsel kaydı aşağıda korunur. Uygulama durumu şema 2'dir; veritabanı sürümü 1 kalır ve hydrateState eski cevapları/tercihleri koruyarak yeni practice/anime alanlarını ekler. Karakter ve anime soruları sürümlü, kararlı kimliklerle aynı cevap/tekrar modelinde çözülür; cevap türü tanıma ve klavyeyle geri çağırmayı ayırmak için olayda tutulur.
+
+Sunucu artık statik dosyalara ek olarak sabit MyMemory /get hedefine POST /api/translate aracılığı yapar. İstek UTF-8 bayt/paragraf/dil çifti kontrolü ve zaman aşımı içerir. Cross-origin tarayıcı istekleri reddedilir; anahtar gerektirmez, metin veya sonuç loglanmaz. TR↔JA iki adımda İngilizce üzerinden çevrilir; ara dil yolu sonuçta gösterilir. Çeviri hiçbir alıştırmanın puanlamasına bağlanmaz.
+
+YouTube IFrame API ve oynatıcı yalnızca kullanıcının kesiti açmasıyla dış kaynaktan yüklenir. Gerçek medya indirilmez veya yerel olarak dağıtılmaz. Bir doğrulanmış kısa altyazı aralığı getCurrentTime ile eşlenir; diğer kartlarda otomatik zaman eşlemesi iddia edilmez. Harici hizmetler nedeniyle 0.1'deki “hiç harici istek yok” sınırı artık yalnızca yerel karakter/okuma/tekrar modülleri için geçerlidir.
+
 ## Geri alınabilir başlangıç kararları
 
 Üç metinlik doğrulama paketinde framework ve backend olmadan ES modülleri; IndexedDB'de tek sürümlü durum kaydı. Bu, veri modelindeki varlıkları birleştirmez: sözlük, okunuş, anlam, cümle, gramer, içerik sürümü, cevap olayı ve beceri durumu ayrı kimliklere sahiptir. Küçük veri kümesinin tümü tek IndexedDB işlemiyle kaydedilir. Hacim büyürse ayrı store'lara ayrılabilir.

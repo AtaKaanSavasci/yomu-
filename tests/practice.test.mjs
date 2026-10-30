@@ -28,6 +28,8 @@ test('every generated question resolves from review IDs and has valid choices',(
 test('romanization alternatives and uppercase I work in Turkish; wrong kana is rejected',()=>{
  const q=getCharacterQuestion('character:reading:hiragana-shi');assert.ok(gradeAnswer(q,'SHI','tr'));assert.ok(gradeAnswer(q,'si','tr'));assert.equal(gradeAnswer(q,'chi','tr'),false);
  assert.ok(gradeAnswer(getCharacterQuestion('character:reading:katakana-du'),'dzu','en'));
+ assert.ok(gradeAnswer(getCharacterQuestion('character:reading:kanji-sun'),'にっぽん','tr'));
+ assert.ok(gradeAnswer(getCharacterQuestion('character:reading:kanji-school'),'GAKKŌ','tr'));
  assert.ok(gradeAnswer(getCharacterQuestion('character:writing:katakana-shi'),'シ','tr'));
  assert.equal(gradeAnswer(getCharacterQuestion('character:writing:katakana-shi'),'し','tr'),false);
 });
