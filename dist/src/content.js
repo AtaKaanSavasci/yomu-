@@ -1,5 +1,6 @@
 import {getCharacterQuestion} from './characters.js';
 import {getAnimeQuestion} from './anime.js';
+import {getStudyQuestion} from './study-data.js';
 // Original prototype content, generated for this project; not human-editor approved.
 export const CONTENT_VERSION = '2026-10-30.1';
 export const provenance = { author: 'AI-assisted original prototype content', humanReviewed: false, audio: null, version: CONTENT_VERSION };
@@ -60,6 +61,7 @@ export const questions = [
   q('p-writing', 'weekend-park', 'ni', 'writing', { tr: 'Yeni bağlam: “Kütüphaneye giderim.” Yön parçacığını yaz.', en: 'New context: “I go to the library.” Fill in a destination particle.' }, '図書館［　］行きます。', { tr: ['に', 'へ'], en: ['に', 'へ'] }, { tr: 'に varış yerini, へ yönü vurgular. Bu cümlede ikisi de kabul edilir.', en: 'に emphasizes the destination; へ emphasizes the direction. Both work in this sentence.' }),
 ];
 export function getQuestion(id) {
+  const study=getStudyQuestion(id);if(study)return study;
   const extra=getCharacterQuestion(id)||getAnimeQuestion(id);if(extra)return extra;
   const existing = questions.find(q => q.id === id);
   if (existing) return existing;

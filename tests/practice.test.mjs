@@ -37,9 +37,9 @@ test('rounds use at most ten distinct selected questions and no fake answer even
  const config={...defaultPractice(),groups:['a']};const round=createCharacterSession(config,()=>0.4);assert.equal(round.ids.length,5);assert.equal(new Set(round.ids).size,5);assert.equal(round.eventIds.length,0);
  assert.ok(round.ids.every(id=>id.includes('hiragana-')));
 });
-test('existing schema 1 answers and preferences survive additive schema 2 migration',()=>{
+test('existing schema 1 answers and preferences survive additive schema 3 migration',()=>{
  const old={schemaVersion:1,revision:4,settings:{language:'en'},events:[{id:'old'}],skillStates:{saved:{attempts:1}},lessons:{a:{completedAt:'old'}},issues:[],session:null};
- const migrated=hydrateState(old);assert.equal(migrated.schemaVersion,2);assert.equal(migrated.revision,4);assert.equal(migrated.settings.language,'en');assert.deepEqual(migrated.events,old.events);assert.deepEqual(migrated.skillStates,old.skillStates);assert.ok(migrated.practice);assert.ok(migrated.anime);assert.equal(old.schemaVersion,1);
+ const migrated=hydrateState(old);assert.equal(migrated.schemaVersion,3);assert.equal(migrated.revision,4);assert.equal(migrated.settings.language,'en');assert.deepEqual(migrated.events,old.events);assert.deepEqual(migrated.skillStates,old.skillStates);assert.ok(migrated.practice);assert.ok(migrated.anime);assert.equal(old.schemaVersion,1);
 });
 test('all four requested anime have official publisher video IDs and answer keys',()=>{
  assert.deepEqual(new Set(animeQuotes.map(q=>q.series)),new Set(['Naruto','Bleach','Vinland Saga','Jujutsu Kaisen']));

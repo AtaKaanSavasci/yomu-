@@ -1,4 +1,21 @@
-# Doğrulama kaydı · 30 Ekim 2026
+# Doğrulama kaydı · 31 Ekim 2026
+
+## 0.3 · Kelime, cümle ve gramer
+
+Windows, Node.js 26.11.1 ve uygulama içi Chromium. 41/41 otomatik test ve bütün uygulama/sunucu JS dosyalarının sözdizimi kontrolü başarılı. Sekiz yeni test: 60/40/25 içerik sayısı ve tüm düzey/konu/ortam kapsamı; benzersiz kimlikler ve TR/EN örnekler; tüm soru türlerinin tekrar kimlikleriyle çözümlenmesi; tek doğru seçenek; boşluk hedefleri ve varyantları; birleşik filtre/arama; karışık turun 10 soruyla sınırı ve seçki anlık görüntüsü; başarı üretmeden kaydetme ve önceki aralıkları koruma; beceri ayrımı ve yanlışta 10 dakika; şema 2 cevap/harf oturumunun şema 3’te korunması. Önceki alfabe otomatik geçiş testleri de geçti.
+
+Gerçek tarayıcıda gözlenenler:
+
+- N3 → Yazılım seçimi dört doğru kart getirdi. 変数 kaydı iki ayrı tekrar kartı oluşturdu. Arama tek kelimeye daraltıldı ve temizleme dört karta döndü.
+- Yanlış anlam seçimi gerekçe/cevap gösterdi; yenilemede aynı geri bildirim korundu. へんすう doğru kabul edildi; tek soruluk turun özeti 1/1 gösterdi.
+- N1 → İş yerinde cümleleri ve resmî kullanım notu açıldı. をよぎなく kana varyantı doğru kabul edildi.
+- N4 gramer kartından boşluk doldurmaya geçildi. ことが doğru kabul edildi ve açıklama gösterildi.
+- Ortak tekrar listesinde yeni kelime, cümle ve gramer kartları doğru Japonca bağlamla çözümlendi. Kaydedilen 変数 anlam kartı tekrar ekranında cevaplanıp zamanlandı. Dördüncü seçenek klavyede 4 ile seçilebildi.
+- Ana sayfada üç yeni bağlantı; menüde Kelimeler/Cümleler/Gramer. Yeni kelime sayfası İngilizce açıldı; Türkçeye dönüş çalıştı.
+- Mobil 390×844, ayrıca 320×740 ve büyük yazı açıkken üç yeni sayfa ile ana sayfa incelendi; belge genişliği görünüm genişliğini aşmadı. Alt menü altı öğe içeriyor; anime, okuma ve tekrar ana sayfadan erişilebilir.
+- Son tarayıcı kontrolünde yakalanmış konsol hatası yoktu. QA için ayrı yerel portlar kullanıldı; test verileri GitHub’a veya pakete eklenmedi.
+
+Bu kontrol insan Japonca editörü onayı, eksiksiz JLPT müfredatı, fiziksel telefon veya ekran okuyucu testi değildir. 0.2 anime oynatıcısı/gerçek çeviri hizmeti bu sürümde yeniden sınanmadı. Aşağıdaki eski sürüm kayıtları tarihsel olarak korunur.
 
 ## 0.2.1 · Alfabe akışı
 

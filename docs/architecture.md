@@ -1,5 +1,13 @@
 # Mimari ve tekrar kararı · 30 Ekim 2026
 
+## 0.3 ekleri
+
+Güncel durum şema 3’tür; IndexedDB sürümü 1 kalır. learning alanında vocabulary/sentences/grammar için ayrı düzey, konu/ortam, arama, seçili kart ve okunuş tercihleri bulunur. Bir ortak çalışma oturumu, başlarken karıştırılmış en fazla 10 soru kimliğini saklar; filtreler değişince bu oturum sessizce değişmez. Yeni tur açıkça başlatılır. Şema 1/2 kayıtları derin varsayılan birleştirmesiyle taşınır; cevaplar, tekrar aralıkları ve harf/anime oturumları korunur.
+
+study-data.js özgün 60 kelime, 40 cümle ve 25 gramer konusunu içerir. study-flow.js seçki/oturum/kaydetme kararları, study-ui.js üç ekran ve ana sayfa bağlantıları içindir. study:<kind>:<itemId>:<mode> kimlikleri content.getQuestion üzerinden ortak tekrar kuyruğunda çözülür. study- öneki eski sözlük kimlikleriyle çakışmayı önler. Anlam/okunuş/Japonca yazma ayrı becerilerdir; cümle ve gramer yalnızca kontrollü boşluk doldurmadır. Kaydetme cevap olayı üretmez, mevcut aralıkları sıfırlamaz. Yeni paketin içerik sürümü study-2026-10-31.1’dir.
+
+Yeni üç modül harici ağ isteği gerektirmez. Düzeyler yaklaşık çalışma bantlarıdır; dil editörü doğrulaması ve resmî müfredat eşlemesi iddiası yoktur. Aşağıdaki 0.2/0.1 kararları tarihsel kayıttır.
+
 ## 0.2 ekleri
 
 Önceki kararların tarihsel kaydı aşağıda korunur. Uygulama durumu şema 2'dir; veritabanı sürümü 1 kalır ve hydrateState eski cevapları/tercihleri koruyarak yeni practice/anime alanlarını ekler. Karakter ve anime soruları sürümlü, kararlı kimliklerle aynı cevap/tekrar modelinde çözülür; cevap türü tanıma ve klavyeyle geri çağırmayı ayırmak için olayda tutulur.

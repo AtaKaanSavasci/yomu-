@@ -6,6 +6,9 @@ import {animeQuotes,getAnimeQuestion,createCustomQuote} from './anime.js';
 import {hubPage,charactersPage,animePage,translationBox,translationOutput} from './practice-ui.js';
 import {mountClip} from './media.js';
 import {applyCharacterInput,classifyCharacterInput} from './character-flow.js';
+import {studyPage,studyLaunches} from './study-ui.js';
+import {createStudySession,saveStudyItem,selectStudyConfig} from './study-flow.js';
+import {getStudyQuestion,defaultLearning} from './study-data.js';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -73,6 +76,7 @@ function navigate(where) {
   if (route() === where) render(); else location.hash = where;
 }
 function focusHeading() { $('#main h1')?.focus({ preventScroll: true }); window.scrollTo(0, 0); }
+function focusStudy(){const el=$('.study-session .answer-input')||$('.study-session input[type="radio"]')||$('#study-stage-title');el?.focus({preventScroll:true});$('.study-session')?.scrollIntoView({block:'start'});}
 function navLink(id, name, label, count = '') { return `<a class="nav-link ${route() === id ? 'active' : ''}" href="#${id}" ${route() === id ? 'aria-current="page"' : ''}>${icon(name)}<span>${label}</span>${count !== '' ? `<span class="nav-count">${count}</span>` : ''}</a>`; }
 function render() {
   clipCleanup?.();clipCleanup=null;
@@ -84,10 +88,10 @@ function render() {
   $('#app').innerHTML = `<div class="shell"><aside class="sidebar"><a href="#today" class="brand" aria-label="Yomu">${icon('book')}<span>yomu<span class="brand-jp" lang="ja">読む</span></span></a>
     <div class="space-label">${T('JAPONCA ÇALIŞMA ALANIN', 'YOUR JAPANESE STUDY SPACE')}</div>
     <nav aria-label="${T('Ana menü', 'Main navigation')}">
-      ${navLink('today', 'home', T('Bugün', 'Today'))}${navLink('characters','book',T('Harfler','Characters'))}${navLink('anime','sound',T('Anime replikleri','Anime lines'))}${navLink('library', 'leaf', T('Okuma köşesi', 'Read'))}${navLink('review', 'repeat', T('Tekrarlarım', 'Reviews'), due)}${navLink('progress', 'chart', T('İlerlemem', 'Progress'))}
+      ${navLink('today', 'home', T('Bugün', 'Today'))}${navLink('characters','book',T('Harfler','Characters'))}${navLink('vocabulary','leaf',T('Kelimeler','Words'))}${navLink('sentences','book',T('Cümleler','Sentences'))}${navLink('grammar','book',T('Gramer','Grammar'))}${navLink('anime','sound',T('Anime replikleri','Anime lines'))}${navLink('library', 'leaf', T('Okuma köşesi', 'Read'))}${navLink('review', 'repeat', T('Tekrarlarım', 'Reviews'), due)}${navLink('progress', 'chart', T('İlerlemem', 'Progress'))}
     </nav><div class="sidebar-bottom"><div class="quiet-note"><span lang="ja">一歩ずつ。</span><p>${T('Her gün, küçük bir adım.', 'A small step, every day.')}</p></div>${navLink('settings', 'settings', T('Tercihler ve veriler', 'Preferences & data'))}<div class="local-label"><i></i>${T('Bu tarayıcıya kaydedilir', 'Saved in this browser')}</div></div>
   </aside><div class="workspace"><header class="topbar"><span class="top-caption">${T('Kendine biraz Japonca zamanı ayır.', 'Make a little time for Japanese.')}</span><div class="top-controls"><button class="text-size" data-action="large" aria-pressed="${state.settings.largeText}" aria-label="${T('Büyük yazı', 'Large text')}">A<span>A</span></button><div class="language-switch" aria-label="${T('Arayüz dili', 'Interface language')}"><button data-lang="tr" aria-pressed="${state.settings.language === 'tr'}">TR</button><button data-lang="en" aria-pressed="${state.settings.language === 'en'}">EN</button></div><span class="avatar" aria-hidden="true">読</span></div></header>
-    <main id="main" tabindex="-1"><div id="storage-error" class="error-banner" role="alert" hidden></div><div class="date-line"><span>${esc(date)}</span><span class="prototype-tag">${T('YEREL PROTOTİP', 'LOCAL PROTOTYPE')} · 0.2</span></div>${page()}</main>
+    <main id="main" tabindex="-1"><div id="storage-error" class="error-banner" role="alert" hidden></div><div class="date-line"><span>${esc(date)}</span><span class="prototype-tag">${T('YEREL PROTOTİP', 'LOCAL PROTOTYPE')} · 0.3</span></div>${page()}</main>
     <footer><span>yomu · ${T('Küçük metinler, yeni dünyalar.', 'Small texts, new worlds.')}</span><span>${T('Çalışma notları · İnsan editörü onayı bekliyor', 'Study notes · Awaiting human editorial review')}</span></footer></div></div>`;
   $('.top-controls').insertAdjacentHTML('afterbegin', `<button class="translator-trigger" data-action="open-translation" aria-label="${T('Çeviri masasını aç','Open translation desk')}"><span>文</span><span>${T('Çevir','Translate')}</span></button><a class="mobile-settings" href="#settings" aria-label="${T('Tercihler ve veriler', 'Preferences & data')}">${icon('settings')}</a>`);
   if (storageError) showStorageError();
@@ -98,12 +102,13 @@ function page() {
   if (r.startsWith('lesson/')) return lessonPage(r.split('/')[1]);
   if(r==='characters')return charactersPage(state,ui());
   if(r==='anime')return animePage(state,ui());
+  if(['vocabulary','sentences','grammar'].includes(r))return studyPage(state,r,ui());
   if(r==='translate')return `${heading(T('ÇEVİRİ MASASI','TRANSLATION DESK'),T('Üç dil, altı yön.','Three languages. Six directions.'),T('Türkçe ↔ Japonca ↔ İngilizce.','Turkish ↔ Japanese ↔ English.'))}${translationBox(translationDraft,ui(),'full')}`;
   if (r === 'library') return libraryPage();
   if (r === 'review') return reviewPage();
   if (r === 'progress') return progressPage();
   if (r === 'settings') return settingsPage();
-  return hubPage(state,ui(),translationDraft);
+  return hubPage(state,ui(),translationDraft).replace('<div class="hub-grid">',studyLaunches(ui())+'<div class="hub-grid">');
 }
 function button(label, action, style = 'primary', extra = '') { return `<button class="btn ${style}" data-action="${action}" ${extra}>${label}</button>`; }
 function heading(eyebrow, title, sub) { return `<div class="page-heading"><p class="eyebrow">${eyebrow}</p><h1 tabindex="-1">${title}</h1><p class="muted">${sub}</p></div>`; }
@@ -337,6 +342,15 @@ document.addEventListener('click', async e => {
   }
   if (busy) return;
   let next = structuredClone(state);
+  if(action==='study-level'||action==='study-clear'||action==='study-reset'){
+   const kind=target.dataset.kind,changes=action==='study-level'?{level:target.dataset.level}:action==='study-clear'?{search:''}:defaultLearning()[kind];
+   if(await commit(selectStudyConfig(state,kind,changes))){const focus=action==='study-level'?`[data-action="study-level"][data-level="${target.dataset.level}"]`:'#study-search';$(focus)?.focus({preventScroll:true});}return;
+  }
+  if(action==='study-select'){next.learning[target.dataset.kind].selectedId=target.dataset.item;if(await commit(next))$('.study-detail h2')?.scrollIntoView({block:'nearest'});return;}
+  if(action==='study-save'){if(await commit(saveStudyItem(state,target.dataset.kind,target.dataset.item)))toast(T('Tekrar listene eklendi. Başarı kaydı eklenmedi.','Saved for review. No success was recorded.'));return;}
+  if(action==='study-start'){const kind=target.dataset.kind;next.learning.session=createStudySession(kind,next.learning[kind]);if(!next.learning.session)return;if(await commit(next)){questionStarted=performance.now();focusStudy();}return;}
+  if(action==='study-close'){next.learning.session=null;await commit(next);return;}
+  if(action==='study-next'){const s=next.learning.session;if(!s?.feedback)return;s.index++;s.feedback=null;if(s.index>=s.ids.length)s.phase='done';if(await commit(next)){questionStarted=performance.now();focusStudy();}return;}
   if(action==='quick-script'||action==='lab-script'){next.practice.script=target.dataset.script;if(await commit(next,false)){if(action==='quick-script')navigate('characters');else render();}return;}
   if(action==='lab-all'||action==='lab-none'){next.practice.groups=action==='lab-all'?groupsFor(next.practice.level).map(g=>g.id):[];await commit(next);return;}
   if(action==='lab-start'){try{next.practice.session=createCharacterSession(next.practice);if(await commit(next)){questionStarted=performance.now();$('.practice-stage')?.scrollIntoView({block:'start',behavior:'smooth'});($('#lab-answer-input') || $('[data-form="lab-answer"] input[type="radio"]'))?.focus({preventScroll:true});}}catch{$('#lab-validation').textContent=T('En az bir satır seç.','Choose at least one row.');}return;}
@@ -358,6 +372,7 @@ document.addEventListener('click', async e => {
   if (action === 'toggle-suspend') { const item = next.skillStates[target.dataset.key]; item.suspended = !item.suspended; await commit(next); }
 });
 document.addEventListener('change', async e => {
+  if(e.target.dataset.study){if(busy)return;const kind=e.target.dataset.studyKind,key=e.target.dataset.study;const value=key==='showReading'?e.target.checked:e.target.value;if(await commit(selectStudyConfig(state,kind,{[key]:value})))$(`[data-study="${key}"]`)?.focus({preventScroll:true});return;}
   if(e.target.matches('[data-form="lab-answer"] input[type="radio"]')){queueCharacterInput(e.target.form);return;}
   if(e.target.closest('[data-form="translation"]')){if(['source','target'].includes(e.target.name)){invalidateTranslation();translationDraft[e.target.name]=e.target.value;if(translationDraft.source===translationDraft.target){const other=e.target.name==='source'?'target':'source';translationDraft[other]=['tr','ja','en'].find(l=>l!==e.target.value);}syncTranslation();}return;}
   if(e.target.dataset.lab){const key=e.target.dataset.lab,next=structuredClone(state);next.practice[key]=e.target.type==='checkbox'?e.target.checked:e.target.value;if(key==='level')next.practice.groups=groupsFor(e.target.value).map(g=>g.id);await commit(next);return;}
@@ -374,13 +389,21 @@ document.addEventListener('compositionend',e=>{if(e.target.matches('[data-form="
 document.addEventListener('keydown', e => {
   if(e.key==='Enter' && e.target.matches('[data-form="lab-answer"] .answer-input')){if(e.isComposing||e.keyCode===229||composingCharacterInputs.has(e.target))return;e.preventDefault();if(!e.repeat)queueCharacterInput(e.target.form,true);return;}
   if (e.isComposing || e.ctrlKey || e.altKey || e.metaKey || e.target.matches('input,textarea,select') || state.session?.feedback) return;
-  if (/^[1-3]$/.test(e.key)) {
+  if (/^[1-4]$/.test(e.key)) {
     const radio = document.querySelectorAll('.choices input')[Number(e.key)-1];
     if (radio && !radio.disabled) { radio.checked = true; radio.focus(); }
   }
 });
 document.addEventListener('submit', async e => {
   const form = e.target;
+  if(form.dataset.form==='study-search'){e.preventDefault();if(busy)return;if(await commit(selectStudyConfig(state,form.dataset.kind,{search:String(new FormData(form).get('search')||'').trim()})))$('#study-search')?.focus({preventScroll:true});return;}
+  if(form.dataset.form==='study-answer'){
+   e.preventDefault();if(busy)return;const s=state.learning.session;if(!s||s.phase!=='exercise'||s.feedback||route()!==s.kind)return;
+   const answer=String(new FormData(form).get('answer')||'').trim();if(!answer)return;
+   const q=getStudyQuestion(s.ids[s.index]),id=crypto.randomUUID();if(!q)return;
+   const next=recordAnswer(state,q,answer,new Date(),id,Math.min(600000,Math.round(performance.now()-questionStarted)),s.kind);next.learning.session.feedback=id;next.learning.session.eventIds.push(id);
+   if(await commit(next))$('.study-session .feedback')?.focus({preventScroll:true});return;
+  }
   if(form.dataset.form==='lab-answer' && form.dataset.questionId){e.preventDefault();queueCharacterInput(form,true);return;}
   if(form.dataset.form==='translation'){e.preventDefault();await performTranslation(form);return;}
   if(['lab-answer','quote-answer'].includes(form.dataset.form)){e.preventDefault();await answerNewExercise(form,form.dataset.form);return;}
@@ -409,7 +432,7 @@ document.addEventListener('submit', async e => {
     if (await commit(next)) { if ($('#dialog').open) $('#dialog').close(); toast(T('Tercihlerin kaydedildi.', 'Preferences saved.')); }
   } else {
     const next = structuredClone(state);
-    next.issues.push({ id: crypto.randomUUID(), questionId: form.dataset.questionId, contentVersion: CONTENT_VERSION, description: String(data.get('description')).trim(), createdAt: new Date().toISOString(), status: 'local-only' });
+    next.issues.push({ id: crypto.randomUUID(), questionId: form.dataset.questionId, contentVersion: getQuestion(form.dataset.questionId)?.version || CONTENT_VERSION, description: String(data.get('description')).trim(), createdAt: new Date().toISOString(), status: 'local-only' });
     if (!next.issues.at(-1).description) return;
     if (await commit(next)) { $('#dialog').close(); toast(T('Notun bu tarayıcıya kaydedildi.', 'Your note was saved in this browser.')); }
   }

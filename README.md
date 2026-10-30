@@ -1,6 +1,6 @@
 # Yomu · Japonca çalışma alanı
 
-**0.2.1 · 30 Ekim 2026** — Hiragana, katakana ve kanji pratiği; anime replikleri; Türkçe/Japonca/İngilizce çeviri. İlk okuma ve tekrar prototipi korunarak çalışma alanı genişletildi.
+**0.3.0 · 31 Ekim 2026** — N5–N1 çalışma bantlarında kelimeler, ortama göre cümleler ve gramer. Harf pratiği, anime, çeviri, okuma ve kişisel tekrar alanlarıyla birlikte çalışır.
 
 ## Çalıştırma
 
@@ -8,7 +8,19 @@ Node.js 22+ gerekir. Windows'ta **Yomu-baslat.cmd** dosyasını çift tıkla vey
 
 Önceden açılmış 0.1 sunucusu varsa önce o sunucuyu durdurup yeniden başlat: yeni çeviri API'si eski sunucuda bulunmaz. Başka bir port için PowerShell'de **$env:PORT = '4174'** ardından **npm start** kullanılabilir.
 
-Dil tercihi, ilerleme, cevaplar ve tekrarlar IndexedDB'de **aynı tarayıcı + aynı adres/port** için saklanır. Farklı portta önceki verilerin görünmemesi silindikleri anlamına gelmez. 0.1 kayıtları şema 2'ye eklemeli olarak taşınır; cevaplar korunur.
+Dil tercihi, ilerleme, cevaplar ve tekrarlar IndexedDB'de **aynı tarayıcı + aynı adres/port** için saklanır. Farklı portta önceki verilerin görünmemesi silindikleri anlamına gelmez. 0.1/0.2 kayıtları şema 3’e eklemeli olarak taşınır; cevaplar, tercihler ve mevcut harf oturumları korunur.
+
+## 0.3 · Kelime, cümle ve gramer
+
+- **Kelimeler:** Her N5/N4/N3/N2/N1 bandında meyveler (ilgili tarım/gıda sözcükleri dahil), eşyalar ve yazılım başlıkları. Her başlık ve düzeyde dört kelime: toplam 60. Japonca yazım, kana okunuşu, TR/EN anlamı ve örnek cümle. Anlam seçme, kana okunuşu yazma veya Japonca yazma alıştırmaları.
+- **Cümleler:** Restoranda, günlük hayatta, iş yerinde ve arkadaş arasında; her düzey/ortam için iki örnek: toplam 40. Çeviri, kana okunuşu ve samimi/resmî kullanım notları. Boşluk doldurma pratiği; tanımlı kanji/kana varyantları kabul edilir.
+- **Gramer:** Her düzeyde beş konu, toplam 25. Biçim, TR/EN açıklama, okunuşlu örnek ve boşluk doldurma. N5’te です ve たい; ileri düzeylerde にもかかわらず ve べく gibi yapılar.
+- Düzey/başlık filtreleri, iki arayüz dilinde ve Japonca içerikte arama, okunuşu gizleme, önceki/sonraki kart ve tekrara kaydetme. Aramayı **Ara** düğmesi veya Enter ile uygula. Her tur seçilmiş içerikten en fazla 10 farklı, karıştırılmış soru içerir. Devam eden tur başlangıç seçkisini korur; yeni tur düğmesi güncel filtreyi kullanır.
+- Kaydetmek cevap veya başarı üretmez. Kelimeler anlam/okunuş; cümle ve gramer boşluk doldurma kartları olarak ortak tekrar listesine eklenir. Cevap, gerekçe ve tur konumu sayfa yenilemesinde korunur.
+
+Bu, **60 kelime + 40 cümle + 25 gramer konusundan oluşan başlangıç paketidir**. Düzey etiketleri yaklaşık çalışma bantlarıdır; resmî veya eksiksiz JLPT kelime/gramer listeleri değildir. Özellikle yazılım terimleri alan söz varlığıdır. İçerik AI yardımıyla özgün hazırlandı; insan Japonca editörü onayı yoktur. [İçerik notları ve kaynak](docs/sources-v03.md).
+
+**41 otomatik test başarılı**; yeni üç ekran gerçek tarayıcıda, 390 ve 320 piksel mobil genişliklerde ve büyük yazıda kontrol edildi. Ayrıntılar [QA](docs/qa.md) kaydında.
 
 ## 0.2.1 · Enter gerektirmeyen alfabe pratiği
 
@@ -49,7 +61,7 @@ Doğrudan Türkçe/Japonca çeviri hafızasında “Merhaba” için bile hatal�
 
 ## Veri ve tekrar
 
-Şema 2; IndexedDB veritabanı sürümü 1. Kelime, okunuş, anlam, cümle, gramer, sürümlü soru ve beceri durumu ayrı kimliklere sahiptir. Her cevap UUID, zaman, saat dilimi, gün, içerik/algoritma sürümü, mod ve cevap türü içerir. Tek IndexedDB işlemi ve revizyon karşılaştırması eski sekmenin kayıtları ezmesini önler. Başarı yalnızca kayıt tamamlanınca gösterilir.
+Şema 3; IndexedDB veritabanı sürümü 1. Kelime, okunuş, anlam, cümle, gramer, sürümlü soru ve beceri durumu ayrı kimliklere sahiptir. Her cevap UUID, zaman, saat dilimi, gün, içerik/algoritma sürümü, mod ve cevap türü içerir. Tek IndexedDB işlemi ve revizyon karşılaştırması eski sekmenin kayıtları ezmesini önler. Başarı yalnızca kayıt tamamlanınca gösterilir.
 
 Tekrar algoritması **fixed-interval-v1**: yanlışta 10 dakika; ardışık doğru cevaplarda 1, 3, 7, 14, 30 gün. FSRS veya kişisel bellek tahmini kullanılmaz. Ayrıntılar ve MIT lisanslı FSRS adayının değerlendirmesi [docs/architecture.md](docs/architecture.md) dosyasında.
 
@@ -59,11 +71,11 @@ Gün sınırı seçili IANA saat diliminde 00.00; aralık “1 gün” için ge�
 
 Üretim bağımlılığı yok; HTML/CSS/ES modülleri ve Node HTTP. Tek geliştirme bağımlılığı fake-indexeddb 6.2.7 (Apache-2.0).
 
-**npm ci**, **npm run check**, **npm test**: 27 test. Eski kayıtların taşınması, 208 kana varyantının soru çözümlemesi, bağlamlı kanji, cevap varyantları, anime/kullanıcı soruları, altı çeviri yönü ve hata/kota durumları dahil. [Doğrulama kaydı](docs/qa.md).
+**npm ci**, **npm run check**, **npm test**: güncel toplam 41 test. Eski kayıtların taşınması, 208 kana varyantının soru çözümlemesi, bağlamlı kanji, cevap varyantları, anime/kullanıcı soruları, altı çeviri yönü ve hata/kota durumları dahil. [Doğrulama kaydı](docs/qa.md).
 
 0.2 ana sayfası, karakter seçim ekranı ve çeviri isteği gerçek tarayıcıda açıldı. Sonrasında Computer Use, Chrome adresini güvenilir biçimde doğrulayamadığı için durdu; yeni akışların tümü için mobil/görsel uçtan uca doğrulama tamamlanamadı. docs/qa içindeki önceki üç görsel **0.1 sürümüne aittir**; alphabet-auto-flow.jpg, 0.2.1 alfabe geri bildirim ekranıdır. Bu sınır yeni ekranların tamamı görsel olarak doğrulanmış gibi yorumlanmamalıdır.
 
-Başlıca dosyalar: dist/src/characters.js, anime.js, practice-ui.js, media.js; önceki app.js/content.js/model.js/storage.js; scripts/translation.mjs; tests/practice.test.mjs ve translation.test.mjs.
+0.3 dosyaları: dist/src/study-data.js, study-flow.js, study-ui.js, dist/study.css ve tests/study.test.mjs. Başlıca önceki dosyalar: dist/src/characters.js, anime.js, practice-ui.js, media.js; önceki app.js/content.js/model.js/storage.js; scripts/translation.mjs; tests/practice.test.mjs ve translation.test.mjs.
 
 ## Araştırma ve GitHub
 
