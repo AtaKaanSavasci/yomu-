@@ -1,5 +1,15 @@
 # Mimari ve tekrar kararı · 30 Ekim 2026
 
+## 0.6 · Okunuş, kaynaklı kanji ve hatırlatıcı
+
+reading-ui.js soru/kart yazımını kaçırır ve Han karakterlerini bağımsız erişilebilir düğmelere dönüştürür. Okunuş ipucu güncellemesi yalnızca ilgili satırı/düğmeyi değiştirir; cevap alanı yeniden oluşturulmaz. Cevap sonrası kana her iki sonuçta görünür. Kelime meta verisi study-data/content çözümleyicilerinden gelir; cümle okunuşu otomatik üretilmez. Yeni kelime/tekrar olaylarına readingHintShown eklenir; geçmiş cevaplar değiştirilmez.
+
+kanji-info.js sabit kanjiapi.dev ve KanjiVG GitHub uçlarından seçilen tek karakter için veri ister. Yanıttaki karakter kimliği ve alan tipleri doğrulanır. SVG çalıştırılmaz veya DOM’a eklenmez; yalnızca sınırlandırılmış g/path öznitelikleri okunur. Tam olmayan gruplar açıkça etiketlenir. phon özniteliğinden ses/köken çıkarımı yapılmaz. En fazla sekiz doğrudan bileşenin sözlük anlamı ayrıca alınır. Bellek önbelleği 24 saat ve 500 karakterle sınırlıdır; çevrimdışı sözlük kopyası tutulmaz. Özel oluşum notları yalnızca üç bağlantılı Kanjipedia maddesine dayanır. Kaynaklardan biri çalışmazsa diğeri gösterilebilir; bilgi uydurulmaz. Bu, insan editörü doğrulaması veya kusursuzluk garantisi değildir.
+
+Şema 3 ve IndexedDB sürümü 1 korunur. settings.questionReadings ve reminder alanı eklemeli varsayılan birleştirmesiyle yüklenir; mevcut kullanıcıda hatırlatıcı kapalı başlar. Yerel saat HH:mm, son tetiklenen yerel tarih ve takvim UID’si cihazda tutulur. 15 saniyelik ön plan kontrolü yalnızca seçilen dakikada, görünür belgede çalışır. CAS kaydı bildirimden önce tamamlanır; iki sekmenin aynı günü iki kez işaretlemesi engellenir. OS bildiriminin teslim garantisi verilmez.
+
+reminders-sw.js yalnızca kullanıcı izniyle kaydedilir; gösterilen bildirime tıklanınca aynı kökendeki çalışma alanını açar/odaklar. Push handler, ağdan push kaydı, sunucu zamanlayıcısı, harici bildirim hesabı veya offline cache yoktur. Google Takvim taslağı kaydedilmez; ICS günlük yerel saatli olay ve VALARM içerir. Dış takvim kaydının oluşturulması/kaldırılması kullanıcının takvimindedir. Önceki 0.5 service worker kapsamı açıklaması bu sürümde yalnızca offline/push için geçerlidir.
+
 ## 0.5.1 · Sunucu kotasında tarayıcı yolu
 
 Gerçek bulut isteğinde sağlayıcı 429/QUOTA döndürürken cihaz bağlantısında 200 görüldü. translation-client.js önce aynı kökendeki API’yi çağırır; yalnızca bu açık kota hatasında, sabit MyMemory /get adresine tarayıcıdan gider. Başka hatalar doğrudan dış isteğe dönüşmez. Bütün doğrudan isteklerde de aynı doğrulama, ara dil, zaman aşımı ve iptal sinyalleri kullanılır. Asıl ortak mantık dist/src/translation-core.js içindedir; scripts/translation-core.mjs uyumluluk dışa aktarımıdır. Worker derlemesi aynı ortak dosyayı gömer.

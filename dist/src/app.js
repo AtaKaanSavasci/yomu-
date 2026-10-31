@@ -1,4 +1,7 @@
 import {requestTranslation} from './translation-client.js';
+import {questionWord,syncReadingHints,installKanjiInfo} from './reading-ui.js';
+import {learningSources} from './learning-sources.js';
+import {reminderSettings,validReminderTime,reminderDue,requestReminderPermission,showReminderNotification,reminderCalendar,googleReminderUrl} from './reminders.js';
 import { lessons, questions, lexemes, wordById, grammarPoints, getQuestion as getContentQuestion, CONTENT_VERSION } from './content.js';
 import { freshState, dayKey, recentDayKeys, recordAnswer, dueStates, addWord, suspendItem, skillSummary, stateKey } from './model.js';
 import { openStore, saveState, ConflictError } from './storage.js';
@@ -22,7 +25,8 @@ const composingCharacterInputs=new WeakSet();
 const T = (tr, en) => state?.settings.language === 'en' ? en : tr;
 const L = obj => obj[state.settings.language];
 const getQuestion=id=>getAnimeQuestion(id,state?.anime.customQuotes)||getContentQuestion(id);
-const ui=()=>({T,L,esc,icon});
+const ui=()=>({T,L,esc,icon,showQuestionReadings:!!state?.settings.questionReadings});
+const hideKanjiInfo=installKanjiInfo(ui);
 const icon = (name, cls = '') => {
   const paths = {
     book: '<path d="M3 5c4-1 6 0 9 2 3-2 5-3 9-2v15c-4-1-6 0-9 2-3-2-5-3-9-2z"/><path d="M12 7v15"/>',
@@ -80,6 +84,7 @@ function focusHeading() { $('#main h1')?.focus({ preventScroll: true }); window.
 function focusStudy(){const el=$('.study-session .answer-input')||$('.study-session input[type="radio"]')||$('#study-stage-title');el?.focus({preventScroll:true});$('.study-session')?.scrollIntoView({block:'start'});}
 function navLink(id, name, label, count = '') { return `<a class="nav-link ${route() === id ? 'active' : ''}" href="#${id}" ${route() === id ? 'aria-current="page"' : ''}>${icon(name)}<span>${label}</span>${count !== '' ? `<span class="nav-count">${count}</span>` : ''}</a>`; }
 function render() {
+  hideKanjiInfo();
   clipCleanup?.();clipCleanup=null;
   document.documentElement.lang = state.settings.language;
   document.documentElement.classList.toggle('large-text', state.settings.largeText);
@@ -92,7 +97,7 @@ function render() {
       ${navLink('today', 'home', T('Bugün', 'Today'))}${navLink('characters','book',T('Harfler','Characters'))}${navLink('vocabulary','leaf',T('Kelimeler','Words'))}${navLink('sentences','book',T('Cümleler','Sentences'))}${navLink('grammar','book',T('Gramer','Grammar'))}${navLink('anime','sound',T('Anime replikleri','Anime lines'))}${navLink('library', 'leaf', T('Okuma köşesi', 'Read'))}${navLink('review', 'repeat', T('Tekrarlarım', 'Reviews'), due)}${navLink('progress', 'chart', T('İlerlemem', 'Progress'))}
     </nav><div class="sidebar-bottom"><div class="quiet-note"><span lang="ja">一歩ずつ。</span><p>${T('Her gün, küçük bir adım.', 'A small step, every day.')}</p></div>${navLink('settings', 'settings', T('Tercihler ve veriler', 'Preferences & data'))}<div class="local-label"><i></i>${T('Bu tarayıcıya kaydedilir', 'Saved in this browser')}</div></div>
   </aside><div class="workspace"><header class="topbar"><span class="top-caption">${T('Kendine biraz Japonca zamanı ayır.', 'Make a little time for Japanese.')}</span><div class="top-controls"><button class="text-size" data-action="large" aria-pressed="${state.settings.largeText}" aria-label="${T('Büyük yazı', 'Large text')}">A<span>A</span></button><div class="language-switch" aria-label="${T('Arayüz dili', 'Interface language')}"><button data-lang="tr" aria-pressed="${state.settings.language === 'tr'}">TR</button><button data-lang="en" aria-pressed="${state.settings.language === 'en'}">EN</button></div><span class="avatar" aria-hidden="true">読</span></div></header>
-    <main id="main" tabindex="-1"><div id="storage-error" class="error-banner" role="alert" hidden></div><div class="date-line"><span>${esc(date)}</span><span class="prototype-tag">${T('JAPONCA ÇALIŞMA ALANI', 'JAPANESE STUDY SPACE')} · 0.5</span></div>${page()}</main>
+    <main id="main" tabindex="-1"><div id="storage-error" class="error-banner" role="alert" hidden></div><div class="date-line"><span>${esc(date)}</span><span class="prototype-tag">${T('JAPONCA ÇALIŞMA ALANI', 'JAPANESE STUDY SPACE')} · 0.6</span></div>${page()}</main>
     <footer><span>yomu · ${T('Küçük metinler, yeni dünyalar.', 'Small texts, new worlds.')}</span><span>${T('Çalışma notları · İnsan editörü onayı bekliyor', 'Study notes · Awaiting human editorial review')}</span></footer></div></div>`;
   $('.top-controls').insertAdjacentHTML('afterbegin', `<button class="translator-trigger" data-action="open-translation" aria-label="${T('Çeviri masasını aç','Open translation desk')}"><span>文</span><span>${T('Çevir','Translate')}</span></button><a class="mobile-settings" href="#settings" aria-label="${T('Tercihler ve veriler', 'Preferences & data')}">${icon('settings')}</a>`);
   if (storageError) showStorageError();
@@ -108,7 +113,8 @@ function page() {
   if (r === 'library') return libraryPage();
   if (r === 'review') return reviewPage();
   if (r === 'progress') return progressPage();
-  if (r === 'settings') return settingsPage();
+  if (r === 'settings') return settingsPage()+reminderSettings(state,ui())+`<p><a class="subtle-link" href="#sources">${T('Kanji kaynakları ve lisanslar','Kanji sources and licences')} →</a></p>`;
+  if(r==='sources')return learningSources(ui());
   return hubPage(state,ui(),translationDraft).replace('<div class="hub-grid">',studyLaunches(ui())+'<div class="hub-grid">');
 }
 function button(label, action, style = 'primary', extra = '') { return `<button class="btn ${style}" data-action="${action}" ${extra}>${label}</button>`; }
@@ -154,7 +160,7 @@ function wordPanel(lesson) {
   return `<div class="word-panel"><p class="eyebrow">${T('BU BAĞLAMDA', 'IN THIS CONTEXT')}</p><h2 class="word-large" lang="ja">${word.written}</h2><p class="word-reading" lang="ja">${word.readings[0].kana}</p><p class="word-meaning">${esc(sense[state.settings.language])}</p><div class="word-context"><span>${T('Metindeki kullanımı', 'From the text')}</span><p lang="ja">${lesson.sentences.find(s => s.tokens.includes(word.id)).tokens.map(t => wordById[t]?.written || t).join('')}</p></div>${button(`${icon(saved ? 'check' : 'repeat')}${saved ? T('Tekrar listende', 'In your review list') : T('Tekrarıma ekle', 'Save for review')}`, 'save-word', 'secondary full-width', `data-word-id="${word.id}" ${saved ? 'disabled' : ''}`)}<p class="small muted">${T('Anlam ve okunuş için ayrı kartlar.', 'Separate cards for meaning and reading.')}</p></div>`;
 }
 const skillName = skill => ({ meaning: T('Anlam', 'Meaning'), reading: T('Okunuş', 'Reading'), listening: T('Dinleme', 'Listening'), writing: T('Yazılı cevap', 'Written answer') })[skill];
-function currentQuestion(session) { return session.mode === 'review' ? getQuestion(session.questionId) : questions.filter(q => q.lessonId === session.lessonId)[session.index]; }
+function currentQuestion(session) { return session.mode === 'review' ? getQuestion(session.questionId) : getQuestion(questions.filter(q => q.lessonId === session.lessonId)[session.index]?.id); }
 function exercisePage(session) {
   const question = currentQuestion(session);
   if (!question) return emptyState(T('Bu soru bulunamadı.', 'Question not found.'), T('Okuma köşesine dön.', 'Return to the reading corner.'), '#library');
@@ -162,7 +168,7 @@ function exercisePage(session) {
   const total = questions.filter(q => q.lessonId === session.lessonId).length;
   const isReview = session.mode === 'review';
   return `<a class="back-link" href="${isReview ? '#today' : '#lesson/' + session.lessonId}" ${isReview ? '' : 'data-action="back-reading"'}>← ${isReview ? T('Bugün', 'Today') : T('Metne dön', 'Back to the text')}</a>${heading(isReview ? T('KİŞİSEL TEKRAR', 'PERSONAL REVIEW') : `${T('KENDİN DENE', 'TRY IT YOURSELF')} · ${(session.index || 0) + 1} / ${total}`, T('Biraz da senden.', 'Now it’s your turn.'), isReview ? T('Bir ipucu olmadan hatırlamayı dene.', 'Try to recall without a hint.') : T('Az önce keşfettiğini şimdi kullan.', 'Put what you just discovered to use.'))}
-  <div class="exercise-layout"><section class="exercise-card"><div class="section-top"><span class="level-pill">${skillName(question.skill)}</span><button class="report-link" data-action="report" data-question-id="${question.id}">${icon('flag')}${T('Sorun bildir', 'Report an issue')}</button></div><h2 id="question-prompt">${esc(L(question.prompt))}</h2><div class="question-context" lang="ja">${esc(question.context)}</div>
+  <div class="exercise-layout"><section class="exercise-card"><div class="section-top"><span class="level-pill">${skillName(question.skill)}</span><button class="report-link" data-action="report" data-question-id="${question.id}">${icon('flag')}${T('Sorun bildir', 'Report an issue')}</button></div><h2 id="question-prompt">${esc(L(question.prompt))}</h2>${questionWord(question,event,ui(),{className:'question-context'})}
     <form id="answer-form" aria-labelledby="question-prompt">${question.choices ? `<fieldset class="choices" ${event ? 'disabled' : ''}><legend class="sr-only">${T('Cevabın', 'Your answer')}</legend>${L(question.choices).map((choice, i) => `<label class="choice"><input type="radio" name="answer" value="${esc(choice)}" required ${event?.answer === choice ? 'checked' : ''}><span class="choice-key">${i + 1}</span><span>${esc(choice)}</span></label>`).join('')}</fieldset>` : `<label class="answer-label" for="answer">${T('Cevabın', 'Your answer')}</label><input id="answer" name="answer" class="answer-input" lang="${question.skill === 'meaning' ? state.settings.language : 'ja'}" type="text" placeholder="${question.skill === 'meaning' ? T('Anlamını yaz…', 'Type the meaning…') : T('Japonca yaz…', 'Type in Japanese…')}" autocomplete="off" autocapitalize="off" spellcheck="false" required maxlength="200" ${event ? 'disabled' : ''} value="${esc(event?.answer || '')}"><p class="small muted">${T('Japonca klavye / IME kullanabilirsin. Enter ile kontrol et.', 'Japanese keyboard / IME supported. Press Enter to check.')}</p>`}
     ${event ? '' : `<button type="submit" class="btn primary full-width">${T('Cevabımı kontrol et', 'Check my answer')}${icon('check')}</button>`}</form>
     ${event ? `<div class="feedback ${event.correct ? 'correct' : 'incorrect'}" role="status"><strong>${event.correct ? T('Evet, tam olarak böyle.', 'Yes, that’s it.') : T('Birlikte bakalım.', 'Let’s take a look.')}</strong><p>${esc(L(question.explanation))}</p><p>${T('Kabul edilen cevaplar', 'Accepted answers')}: <strong>${esc(L(question.answers).join(' / '))}</strong></p><p class="small">${event.correct ? T('Bu beceri için sonraki tekrar zamanlandı.', 'The next review for this skill is scheduled.') : T('Bu beceri 10 dakika sonra tekrar kuyruğuna döner.', 'This skill returns to the review queue in 10 minutes.')}</p></div>${button(`${T('Devam et', 'Continue')}${icon('arrow')}`, 'next-question', 'primary full-width')}` : ''}
@@ -189,7 +195,7 @@ function settingsFields() {
   return `<div class="form-grid"><label>${T('Hedefim', 'My goal')}<select name="goal"><option value="reading" ${state.settings.goal === 'reading' ? 'selected' : ''}>${T('Kısa metinlere geçmek', 'Move on to short texts')}</option><option value="everyday" ${state.settings.goal === 'everyday' ? 'selected' : ''}>${T('Günlük ifadeleri pekiştirmek', 'Practice everyday expressions')}</option></select></label><label>${T('Başlangıç noktam', 'My starting point')}<select name="level"><option value="kana" ${state.settings.level === 'kana' ? 'selected' : ''}>${T('Kana okuyabiliyorum', 'I can read kana')}</option><option value="basic" ${state.settings.level === 'basic' ? 'selected' : ''}>${T('Temel cümlelere aşinayım', 'I know basic sentences')}</option></select></label><label>${T('Günlük niyetim', 'My daily intention')}<select name="dailyMinutes">${[5,10,15].map(n => `<option value="${n}" ${state.settings.dailyMinutes === n ? 'selected' : ''}>${n} ${T('dakika', 'minutes')}</option>`).join('')}</select></label><label>${T('Gün sınırı için saat dilimi', 'Time zone for day boundaries')}<input name="timezone" value="${esc(state.settings.timezone)}" required placeholder="Europe/Istanbul" maxlength="100"><span class="small muted">${T('Gün 00.00’da başlar. IANA adı kullan: Europe/Istanbul gibi.', 'The day starts at 00:00. Use an IANA name, e.g. Europe/Istanbul.')}</span></label></div><p class="small muted">${T('Hedef ve seviye tercihi kaydedilir; bu küçük paketin içeriği değişmez. Günlük süre, cevap önerisini ayarlar.', 'Goal and level are saved; this small content pack stays the same. Daily time adjusts the suggested answer count.')}</p>`;
 }
 function settingsPage() {
-  return `${heading(T('TERCİHLER VE VERİLER', 'PREFERENCES & DATA'), T('Kendi ritmini bul.', 'Find your own rhythm.'), T('İlerleme bu tarayıcıda saklanır. Çeviri ve videolar dış hizmetlerden gelir. Hesap/eşitleme yok.', 'Progress stays in this browser. Translation and videos use external services. No account or sync.'))}<section class="panel"><form id="settings-form">${settingsFields()}<p id="settings-validation" role="alert" class="validation"></p><button class="btn primary" type="submit">${T('Tercihlerimi kaydet', 'Save preferences')}${icon('check')}</button></form></section><section class="panel"><h2>${T('Kayıtların yanında kalsın.', 'Keep your records with you.')}</h2><p>${T('Cevapların, tekrar planın, tercihlerin ve sorun bildirimlerin JSON olarak dışa aktarılır. Bu sürümde içe aktarma yok.', 'Export answers, review schedule, preferences, and issue reports as JSON. Import is not available in this version.')}</p>${button(`${icon('download')}${T('Verilerimi dışa aktar', 'Export my data')}`, 'export', 'secondary')}<p class="small muted">${T('Tarayıcı verilerini silmek kayıtları kaldırır. Özel pencere kalıcı kayıt sağlamayabilir. Düzenli dışa aktarım önerilir.', 'Clearing browser data removes records. Private browsing may not retain them. Export regularly.')}</p></section><section class="panel"><h2>${T('Sorun bildirimlerin', 'Your issue reports')}</h2><p class="muted">${T('Yalnızca burada saklanır; bir ekibe gönderilmez. Dışa aktarılan dosyada yer alır.', 'Stored here only; not sent to a team. Included in your data export.')}</p>${state.issues.length ? `<ul class="issue-list">${state.issues.map(i => `<li><strong>${esc(i.questionId)}</strong> · ${formatDate(i.createdAt)}<p>${esc(i.description)}</p></li>`).join('')}</ul>` : `<p class="small muted">${T('Henüz bildirim yok.', 'No reports yet.')}</p>`}</section><section class="info-note"><p>${T('Paket: Hiragana/katakana için 104’er kana, 20 kanji kelimesi, 4 anime örneği ve kişisel replikler; ayrıca 3 kısa okuma, 9 soru. Çeviri MyMemory üzerinden; videolar yayıncıların YouTube oynatıcısından gelir. Eğitmen onayı ve ücretli paket yok.', 'Pack: 104 kana per script, 20 kanji words, 4 anime examples and personal lines; plus 3 short readings and 9 questions. Translation uses MyMemory; videos use publishers’ YouTube players. No teacher approval or paid tiers.')}<br><span class="small">${T('İçerik sürümü', 'Content version')}: ${CONTENT_VERSION} · ${T('Araştırma', 'Research')}: 30.10.2026.</span></p></section>`;
+  return `${heading(T('TERCİHLER VE VERİLER', 'PREFERENCES & DATA'), T('Kendi ritmini bul.', 'Find your own rhythm.'), T('İlerleme bu tarayıcıda saklanır. Çeviri ve videolar dış hizmetlerden gelir. Hesap/eşitleme yok.', 'Progress stays in this browser. Translation and videos use external services. No account or sync.'))}<section class="panel"><form id="settings-form">${settingsFields()}<p id="settings-validation" role="alert" class="validation"></p><button class="btn primary" type="submit">${T('Tercihlerimi kaydet', 'Save preferences')}${icon('check')}</button></form></section><section class="panel"><h2>${T('Kayıtların yanında kalsın.', 'Keep your records with you.')}</h2><p>${T('Cevapların, tekrar planın, tercihlerin ve sorun bildirimlerin JSON olarak dışa aktarılır. Bu sürümde içe aktarma yok.', 'Export answers, review schedule, preferences, and issue reports as JSON. Import is not available in this version.')}</p>${button(`${icon('download')}${T('Verilerimi dışa aktar', 'Export my data')}`, 'export', 'secondary')}<p class="small muted">${T('Tarayıcı verilerini silmek kayıtları kaldırır. Özel pencere kalıcı kayıt sağlamayabilir. Düzenli dışa aktarım önerilir.', 'Clearing browser data removes records. Private browsing may not retain them. Export regularly.')}</p></section><section class="panel"><h2>${T('Sorun bildirimlerin', 'Your issue reports')}</h2><p class="muted">${T('Yalnızca burada saklanır; bir ekibe gönderilmez. Dışa aktarılan dosyada yer alır.', 'Stored here only; not sent to a team. Included in your data export.')}</p>${state.issues.length ? `<ul class="issue-list">${state.issues.map(i => `<li><strong>${esc(i.questionId)}</strong> · ${formatDate(i.createdAt)}<p>${esc(i.description)}</p></li>`).join('')}</ul>` : `<p class="small muted">${T('Henüz bildirim yok.', 'No reports yet.')}</p>`}</section><section class="info-note"><p>${T('Paket: Hiragana/katakana için 104’er kana, 50 kanji kelimesi, 4 anime örneği ve kişisel replikler; ayrıca 3 kısa okuma, 9 soru. Çeviri MyMemory üzerinden; videolar yayıncıların YouTube oynatıcısından gelir. Eğitmen onayı ve ücretli paket yok.', 'Pack: 104 kana per script, 50 kanji words, 4 anime examples and personal lines; plus 3 short readings and 9 questions. Translation uses MyMemory; videos use publishers’ YouTube players. No teacher approval or paid tiers.')}<br><span class="small">${T('İçerik sürümü', 'Content version')}: ${CONTENT_VERSION} · ${T('Araştırma', 'Research')}: 30.10.2026.</span></p></section>`;
 }
 function openDialog(html) { $('#dialog').innerHTML = html; $('#dialog').showModal(); }
 function setupDialog() { openDialog(`<div class="dialog-heading"><p class="eyebrow">${T('KÜÇÜK BİR BAŞLANGIÇ', 'A LITTLE BEGINNING')}</p><button class="close-dialog" data-action="close-dialog" aria-label="${T('Kapat', 'Close')}">×</button></div><h2>${T('Sana uygun bir ritim.', 'A rhythm that suits you.')}</h2><p class="muted">${T('Bir dakikada ayarla. İstediğin zaman değiştirebilirsin.', 'Set it up in a minute. Change it whenever you like.')}</p><form id="setup-form">${settingsFields()}<p id="settings-validation" role="alert" class="validation"></p><button type="submit" class="btn primary full-width">${T('Bu ritimle başlayalım', 'Let’s start at this pace')}${icon('arrow')}</button></form><button class="subtle-link dialog-skip" data-action="close-dialog">${T('Şimdilik doğrudan örnek dersi keşfet', 'Explore a sample lesson for now')}</button>`); }
@@ -334,6 +340,15 @@ document.addEventListener('click', async e => {
   if(action==='open-translation'){openDialog(`<div class="dialog-heading"><span></span><button class="close-dialog" data-action="close-dialog" aria-label="${T('Kapat','Close')}">×</button></div>${translationBox(translationDraft,ui(),'dialog')}`);return;}
   if(action==='translation-swap'){const text=translationDraft.result || translationDraft.text;invalidateTranslation();[translationDraft.source,translationDraft.target]=[translationDraft.target,translationDraft.source];translationDraft.text=text;syncTranslation();return;}
   if(action==='translation-copy'){try{await navigator.clipboard.writeText(translationDraft.result);toast(T('Çeviri kopyalandı.','Translation copied.'));}catch{toast(T('Kopyalanamadı. Metni seçerek kopyalayabilirsin.','Could not copy. You can select the text manually.'));}return;}
+  if(action==='reminder-permission'){
+    try{const permission=await requestReminderPermission();render();toast(permission==='granted'?T('Bildirim izni açıldı. Hatırlatma yalnızca Yomu açıkken çalışır.','Notifications enabled. The reminder runs only while Yomu is open.'):T('İzin verilmedi veya bu tarayıcı desteklemiyor.','Permission was not granted or this browser is unsupported.'));}catch{toast(T('Bildirim izni açılamadı. Tarayıcı ve telefon ayarlarını kontrol et.','Could not enable notifications. Check browser and phone settings.'));}return;
+  }
+  if(action==='reminder-test'){await fireStudyReminder(true);return;}
+  if(action==='reminder-google'){window.open(googleReminderUrl({time:state.reminder.time,url:location.origin+'/#today'}),'_blank','noopener,noreferrer');return;}
+  if(action==='reminder-ics'){
+   const next=structuredClone(state);next.reminder.calendarUid ||= crypto.randomUUID();if(!await commit(next,false))return;
+   const text=reminderCalendar({time:state.reminder.time,url:location.origin+'/#today',uid:state.reminder.calendarUid});const url=URL.createObjectURL(new Blob([text],{type:'text/calendar;charset=utf-8'}));const anchor=document.createElement('a');anchor.href=url;anchor.download='yomu-gunluk-hatirlatici.ics';anchor.click();setTimeout(()=>URL.revokeObjectURL(url),10000);toast(T('Takvim dosyası hazır. Alarmı etkinleştirmek için takvimine eklemeyi tamamla.','Calendar file ready. Complete adding it to your calendar to enable its alarm.'));return;
+  }
   if(action==='add-quote'){addQuoteDialog();return;}
   if(action==='load-clip'){const quote=[...animeQuotes,...state.anime.customQuotes].find(q=>q.id===target.dataset.quote);if(quote?.videoId){clipCleanup?.();clipCleanup=mountClip($('#video-panel'),quote,ui());$('#video-panel').scrollIntoView({behavior:'smooth',block:'nearest'});}return;}
   if (action === 'export') {
@@ -343,6 +358,12 @@ document.addEventListener('click', async e => {
   }
   if (busy) return;
   let next = structuredClone(state);
+  if(action==='reading-hint'){
+   next.settings.questionReadings=!next.settings.questionReadings;
+   if(next.settings.questionReadings){const session=route()==='vocabulary'?next.learning.session:route()==='review'?next.session:null;if(session){const id=session.ids?.[session.index]||session.questionId;session.readingHintIds=[...new Set([...(session.readingHintIds||[]),id])];}}
+   if(await commit(next,false))syncReadingHints(ui());return;
+  }
+  if(action==='study-card-reading'){next.learning.vocabulary.showReading=!next.learning.vocabulary.showReading;if(await commit(next))$('[data-action="study-card-reading"]')?.focus({preventScroll:true});return;}
   if(action==='study-level'||action==='study-clear'||action==='study-reset'){
    const kind=target.dataset.kind,changes=action==='study-level'?{level:target.dataset.level}:action==='study-clear'?{search:''}:defaultLearning()[kind];
    if(await commit(selectStudyConfig(state,kind,changes))){const focus=action==='study-level'?`[data-action="study-level"][data-level="${target.dataset.level}"]`:'#study-search';$(focus)?.focus({preventScroll:true});}return;
@@ -397,12 +418,15 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('submit', async e => {
   const form = e.target;
+  if(form.dataset.form==='reminder-settings'){
+   e.preventDefault();if(busy)return;const data=new FormData(form),time=String(data.get('time')||'');if(!validReminderTime(time))return;const next=structuredClone(state);Object.assign(next.reminder,{time,enabled:data.get('enabled')==='on',lastFired:next.reminder.time===time?next.reminder.lastFired:null});if(await commit(next))toast(T('Saat kaydedildi. Kapalıyken alarm için takvim seçeneğini kullan.','Time saved. Use the calendar option for reminders when closed.'));return;
+  }
   if(form.dataset.form==='study-search'){e.preventDefault();if(busy)return;if(await commit(selectStudyConfig(state,form.dataset.kind,{search:String(new FormData(form).get('search')||'').trim()})))$('#study-search')?.focus({preventScroll:true});return;}
   if(form.dataset.form==='study-answer'){
    e.preventDefault();if(busy)return;const s=state.learning.session;if(!s||s.phase!=='exercise'||s.feedback||route()!==s.kind)return;
    const answer=String(new FormData(form).get('answer')||'').trim();if(!answer)return;
    const q=getStudyQuestion(s.ids[s.index]),id=crypto.randomUUID();if(!q)return;
-   const next=recordAnswer(state,q,answer,new Date(),id,Math.min(600000,Math.round(performance.now()-questionStarted)),s.kind);next.learning.session.feedback=id;next.learning.session.eventIds.push(id);
+   const next=recordAnswer(state,q,answer,new Date(),id,Math.min(600000,Math.round(performance.now()-questionStarted)),s.kind);next.learning.session.feedback=id;next.learning.session.eventIds.push(id);next.events.at(-1).readingHintShown=!!state.settings.questionReadings||!!s.readingHintIds?.includes(q.id);
    if(await commit(next))$('.study-session .feedback')?.focus({preventScroll:true});return;
   }
   if(form.dataset.form==='lab-answer' && form.dataset.questionId){e.preventDefault();queueCharacterInput(form,true);return;}
@@ -423,7 +447,7 @@ document.addEventListener('submit', async e => {
     if (!answer) return;
     const q = currentQuestion(state.session), id = crypto.randomUUID();
     const next = recordAnswer(state, q, answer, new Date(), id, Math.min(600000, Math.round(performance.now() - questionStarted)), state.session.mode);
-    next.session.feedback = id; next.session.eventIds.push(id);
+    next.session.feedback = id; next.session.eventIds.push(id); next.events.at(-1).readingHintShown=!!state.settings.questionReadings||!!state.session.readingHintIds?.includes(q.id);
     if (await commit(next)) { $('.feedback')?.setAttribute('tabindex','-1'); $('.feedback')?.focus(); }
   } else if (form.id === 'settings-form' || form.id === 'setup-form') {
     const timezone = String(data.get('timezone')).trim();
@@ -442,7 +466,19 @@ window.addEventListener('hashchange', () => { stopAudio(); render(); focusHeadin
 window.addEventListener('pagehide', stopAudio);
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopAudio(); else if (!state.session || state.session.phase !== 'exercise') render(); });
 if ('speechSynthesis' in window) speechSynthesis.addEventListener('voiceschanged', updateAudioStatus);
-try { state = await openStore(); render(); }
+let reminding=false;
+async function fireStudyReminder(test=false){
+ const title=T('Yomu · Japonca zamanı','Yomu · Time for Japanese'),body=T('Küçük bir pratik için çalışma alanını aç.','Open your study space for a little practice.');
+ let shown=false;try{shown=await showReminderNotification(title,body);}catch{}
+ toast(test?(shown?T('Deneme bildirimi gönderildi.','Test notification displayed.'):T('Deneme hatırlatması: Japonca çalışma zamanı. Sistem bildirimi için önce izin ver.','Test reminder: time for Japanese. Enable permission for system notifications.')):body);
+}
+async function checkStudyReminder(){
+ if(!state||busy||reminding||document.visibilityState!=='visible')return;const day=reminderDue(state.reminder);if(!day)return;reminding=true;
+ try{const next=structuredClone(state);next.reminder.lastFired=day;if(await commit(next,false))await fireStudyReminder();}finally{reminding=false;}
+}
+setInterval(()=>void checkStudyReminder(),15000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)void checkStudyReminder();});
+try { state = await openStore(); render(); void checkStudyReminder(); }
 catch {
   state = freshState();
   $('#app').innerHTML = `<main class="fatal"><h1>${T('Yerel kayıt alanı açılamadı.', 'Local storage could not be opened.')}</h1><p>${T('Bu prototip cevaplarını güvenle kaydedebilmek için IndexedDB gerektirir. Tarayıcı ayarlarını kontrol edip sayfayı yenile.', 'This prototype needs IndexedDB to save your answers. Check browser settings and reload.')}</p><button class="btn primary" data-action="reload">${T('Yenile', 'Reload')}</button></main>`;

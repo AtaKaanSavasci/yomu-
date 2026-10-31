@@ -1,6 +1,18 @@
 # Yomu · Japonca çalışma alanı
 
-**0.5.1 · 31 Ekim 2026** — N5–N1 çalışma bantlarında kelimeler, ortama göre cümleler ve gramer. Harf pratiği, anime, çeviri, okuma ve kişisel tekrar alanlarıyla birlikte çalışır.
+**0.6.0 · 1 Kasım 2026** — N5–N1 çalışma bantlarında kelimeler, ortama göre cümleler ve gramer. Okunuş ipuçları, kaynaklı kanji bilgileri ve çalışma hatırlatıcısı eklendi.
+
+## 0.6 · Okunuş, kanji bilgisi ve hatırlatma
+
+Kelime sorularında doğru veya yanlış cevaptan sonra Japonca yazımın hemen altında kana okunuşu görünür. Soru sırasında **Okunuşu göster / gizle** tercihi kullanılabilir; düğme yazılmış cevabı silmez. Okunuş gösterilerek cevaplanan kelime/tekrar soruları olay kaydında `readingHintShown` ile işaretlenir. Kart inceleme ekranında da ayrı okunuş düğmesi vardır. Alfabenin Enter gerektirmeyen akışı korunur.
+
+Japonca soru ve kart başlıklarındaki kanjiye fareyle yaklaş, klavyeyle odaklan veya telefonda dokun. KANJIDIC2 kaynaklı anlamlar/okunuşlar ve KanjiVG yazım bileşenleri internetten alınır. Anlamlar kaynak İngilizcesiyle etiketlenir. Bileşenler tarihsel köken veya sesleri yan yana ekleme kuralı sayılmaz; yalnızca üç özel karakterde bağlantılı Kanjipedia oluşum notu vardır. Eksik bilgi tahmin edilmez. Kaynak/lisans bağlantıları panelde ve **Kanji kaynakları** sayfasındadır. [Kaynak ve lisans notu](docs/sources-v06.md).
+
+**Tercihler ve veriler → Çalışma hatırlatıcısı** altında saat ve dakika seçilir. Yomu yalnızca açık ve görünürken seçilen dakikada günde bir kez kontrol eder; kullanıcı izin verirse tarayıcı bildirimi, vermezse uygulama içi mesaj gösterir. Servis çalışanı yalnızca bu bildirimi gösterme/açma içindir; arka plan saati, push hizmeti veya çevrimdışı önbellek sağlamaz. Telefon uyurken veya uygulama kapalıyken doğrudan web bildirimi henüz etkin değildir.
+
+Kapalı uygulama için aynı bölüm Google Takvim’de günlük etkinlik taslağı açar veya günlük alarm içeren `.ics` dosyası hazırlar. Kullanıcı takvime eklemeyi ve bildirimi etkinleştirmeyi tamamlar; takvim uygulamasının desteği gerekir. Yomu saati değiştirmek mevcut takvim kaydını değiştirmez. OneSignal hesabı/API anahtarı veya zamanlayıcı bağlanmadı; ücretsiz plan bilgisi bir etkinleştirme iddiası değildir. Telefonlar arası ayar/ilerleme eşitlemesi eklenmedi.
+
+**59/59 test başarılı.** Okunuş gizleme/cevap sonrası gösterme, yazma geri bildirimi, kaynak kimliği doğrulama, eksik SVG yapısı, kaynak atfı, saat/dakika sınırı ve günlük takvim alarmı testleri eklendi. Gerçek tarayıcıda kelime cevapları, panel açma/kapama, 390 ve 320 piksel görünüm, ayarların yenilemede korunması ve takvim indirmesi denendi. Sistem bildirim izni verilmedi; fiziksel telefon veya gerçek kapalı uygulama push testi yapılmadı. [QA](docs/qa.md).
 
 ## Telefonda ve çevrimiçi kullanım
 

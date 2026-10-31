@@ -64,11 +64,11 @@ export function getQuestion(id) {
   const study=getStudyQuestion(id);if(study)return study;
   const extra=getCharacterQuestion(id)||getAnimeQuestion(id);if(extra)return extra;
   const existing = questions.find(q => q.id === id);
-  if (existing) return existing;
+  if (existing) {const w=wordById[existing.itemId];return w?{...existing,word:{written:w.written,reading:w.readings[0].kana}}:existing;}
   const match = /^lex-(meaning|reading)-(.+)$/.exec(id);
   if (!match || !wordById[match[2]]) return null;
   const word = wordById[match[2]], sense = word.senses[0], skill = match[1];
-  return { id, itemId: word.id, skill, version: CONTENT_VERSION, context: word.written,
+  return { id, itemId: word.id, skill, version: CONTENT_VERSION, context: word.written, word:{written:word.written,reading:word.readings[0].kana},
     prompt: skill === 'meaning' ? { tr: 'Bu kelimenin anlamını yaz.', en: 'Type the meaning of this word.' } : { tr: 'Okunuşunu kana ile yaz.', en: 'Type the reading in kana.' },
     answers: skill === 'meaning' ? sense.alternatives : { tr: word.id === 'coffee' ? ['コーヒー', 'こーひー'] : [word.readings[0].kana], en: word.id === 'coffee' ? ['コーヒー', 'こーひー'] : [word.readings[0].kana] },
     explanation: { tr: `${word.written} → ${word.readings[0].kana} · ${sense.tr}`, en: `${word.written} → ${word.readings[0].kana} · ${sense.en}` },

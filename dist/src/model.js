@@ -1,14 +1,15 @@
 import { CONTENT_VERSION } from './content.js';
 import { defaultPractice } from './characters.js';
 import { defaultLearning } from './study-data.js';
+import {defaultReminder} from './reminders.js';
 export const SCHEMA_VERSION = 3;
 export const ALGORITHM_VERSION = 'fixed-interval-v1';
 export const SKILLS = ['meaning', 'reading', 'listening', 'writing'];
 export function freshState() {
   return { schemaVersion: SCHEMA_VERSION, contentVersion: CONTENT_VERSION, revision: 0,
-    settings: { language: 'tr', goal: 'reading', level: 'kana', dailyMinutes: 10, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, largeText: false, furigana: true, explanations: true, translation: false, onboarded: false },
+    settings: { language: 'tr', goal: 'reading', level: 'kana', dailyMinutes: 10, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, largeText: false, questionReadings:false, furigana: true, explanations: true, translation: false, onboarded: false },
     events: [], skillStates: {}, lessons: {}, issues: [], session: null,
-    learning:defaultLearning(), practice: defaultPractice(), anime: {level:'all',series:'all',activeId:'vinland-enemies',practice:null,customQuotes:[]} };
+    reminder:defaultReminder(), learning:defaultLearning(), practice: defaultPractice(), anime: {level:'all',series:'all',activeId:'vinland-enemies',practice:null,customQuotes:[]} };
 }
 export function hydrateState(saved) {
   if (!saved) return freshState();
@@ -16,7 +17,7 @@ export function hydrateState(saved) {
   const defaults=freshState();
   const learning={...defaults.learning,...saved.learning};
   for(const kind of ['vocabulary','sentences','grammar'])learning[kind]={...defaults.learning[kind],...saved.learning?.[kind]};
-  return {...defaults,...saved,schemaVersion:SCHEMA_VERSION,settings:{...defaults.settings,...saved.settings},practice:{...defaults.practice,...saved.practice},anime:{...defaults.anime,...saved.anime},learning};
+  return {...defaults,...saved,schemaVersion:SCHEMA_VERSION,settings:{...defaults.settings,...saved.settings},practice:{...defaults.practice,...saved.practice},anime:{...defaults.anime,...saved.anime},reminder:{...defaults.reminder,...saved.reminder},learning};
 }
 export function dayKey(date, timeZone) {
   const parts = new Intl.DateTimeFormat('en', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date(date));

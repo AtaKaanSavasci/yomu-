@@ -1,4 +1,17 @@
-# Doğrulama kaydı · 31 Ekim 2026
+# Doğrulama kaydı · 1 Kasım 2026
+
+## 0.6 · Okunuş, kanji ve hatırlatma
+
+59/59 test, JavaScript sözdizimi kontrolü ve Worker derlemesi başarılı. Yeni on test; cevap öncesi/sonrası kana, yazma sorusunda tam kelime, eski tekrar kimlikleri, kaçırılmış/erişilebilir kanji metni, eksik/tam SVG grupları, sözlük kimliği ve önbellek, kaynak/lisans kapsamı, kapalı varsayılan, seçili dakikada günde bir tetikleme, günlük ICS/VALARM ve kaydedilmemiş Google Takvim taslağını kapsar.
+
+Uygulama içi tarayıcıda ayrı yerel 4179 adresinde:
+
+- N3 yazılım kartında okunuş gizle/göster çalıştı. Okunuş sorusuna yazılan `taslak`, ipucu açılıp kapanırken korundu. Yanlış 不具合 cevabından sonra ふぐあい yazımın hemen altında gösterildi. Sonraki 定義 sorusunda ていぎ doğru kabul edildi ve aynı satırda kaldı. Yenilemede cevap ve okunuş korundu.
+- Kanji paneli gerçek API’den 定 anlamı, on/kun okunuşları, 宀/疋 yazım parçaları ve bunların kaynak anlamlarını getirdi. İlk tıklamadaki odak/kapanma yarışı ve panelin görünümün altını aşması bulundu, düzeltildi ve tekrar denendi. Kapat düğmesi aynı pencereyi yeniden açmadı. Kaynaklar sayfası İngilizce arayüzde incelendi.
+- Hatırlatma 19:37 olarak kaydedildi; yenilemede saat ve açık tercihi korundu. Deneme düğmesi, bildirim izni olmadan uygulama içi mesaj verdi. İzin açılmadı; OS bildirimi gönderildiği iddia edilmez. İndirilen ICS ayrıştırıldı: günlük RRULE, 19:37 yerel başlangıç, sabit UID ve olay saatinde VALARM mevcut. Dış takvim etkinliği kaydedilmedi.
+- 390×844 telefon görünümü ve 320×740 büyük yazıda kelime/panel sınırları denendi; belge yatay taşmadı, panel ekran içinde kaldı. Son konsol denetiminde hata/uyarı yoktu.
+
+Fiziksel telefon, ekran okuyucu, giriş yapılmış canlı UI, sistem izni/OS bildirim teslimi ve dış takvim alarmının telefon teslimi test edilmedi. Kapalı uygulama push hizmeti bağlanmadı. Harici sözlüklerin tüm kayıtları insan editörü tarafından doğrulanmış değildir. Önceki anime/çeviri akışları bu sürümde yeniden elle denenmedi; regresyon testleri geçti. Yerel yapay QA cevapları ve takvim indirmesi kaynak deposuna eklenmez.
 
 ## 0.5.1 · Canlı erişim ve çeviri düzeltmesi
 
