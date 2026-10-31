@@ -1,5 +1,13 @@
 # Doğrulama kaydı · 1 Kasım 2026
 
+## 0.7 · Kelimelerin sesli okunuşu
+
+64/64 test, sözdizimi kontrolü ve Worker derlemesi başarılı. Beş yeni test grubu: 200 kelime/50 kanji kelimesi/eski sözlük kelimelerinin açık kana kaynağı; Japonca olmayan sese geçmeme ve geç yüklenen Japonca ses; normal/yavaş hız ve doğru dil/okunuş; yeni kelimeye geçiş/durdurma/hata sırasında eski callback’lerin yok sayılması; soru öncesi ipucu ve iki geri bildirim sonucunda denetimlerin korunması. Ses motoru testleri kontrollü sahte motorla yapılır; gerçek telaffuz kalitesini kanıtlamaz.
+
+Gerçek uygulama içi tarayıcıda ayrı yerel 4180 adresinde kelime kartı, okunuşu gizleme, N3 yazılım okunuş sorusu ve doğru 不具合 → ふぐあい geri bildirimi incelendi. Cevap öncesi ipucu açıklaması vardı; cevap sonrasında kana satırı ve iki ses düğmesi korundu, ipucu notu kaldırıldı. Eski kafe metni ve kelime paneli açıldı; metin sesi ve yeni kelime ses denetimleri aynı anda doğru destek durumunu gösterdi. 390×844 ve 320×740 büyük yazıda yatay taşma görülmedi. Konsol kontrolünde hata/uyarı yoktu.
+
+Bu tarayıcı Japonca ses sunmadı; normal/yavaş düğmeleri açıklamayla devre dışı kaldı ve İngilizce sesle yanıltıcı oynatma yapılmadı. Gerçek ses çıkışı, Japonca sesli fiziksel telefon ve telaffuz/vurgu kalitesi doğrulanmadı. Başarılı oynatımın düğmeye tıklamadan ses motoruna kadar gerçek cihaz üzerinde uçtan uca doğrulaması bu kayıtta yoktur. Ücretli hizmet veya yeni ses hesabı bağlanmadı.
+
 ## 0.6 · Okunuş, kanji ve hatırlatma
 
 59/59 test, JavaScript sözdizimi kontrolü ve Worker derlemesi başarılı. Yeni on test; cevap öncesi/sonrası kana, yazma sorusunda tam kelime, eski tekrar kimlikleri, kaçırılmış/erişilebilir kanji metni, eksik/tam SVG grupları, sözlük kimliği ve önbellek, kaynak/lisans kapsamı, kapalı varsayılan, seçili dakikada günde bir tetikleme, günlük ICS/VALARM ve kaydedilmemiş Google Takvim taslağını kapsar.

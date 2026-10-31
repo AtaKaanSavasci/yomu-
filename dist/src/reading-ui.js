@@ -1,4 +1,5 @@
 import {isKanji,lookupKanji,kanjiSources} from './kanji-info.js';
+import {pronunciationControls} from './word-speech.js';
 export function kanjiText(text,{esc,T}) {
  return [...String(text)].map(c=>isKanji(c)?`<button type="button" class="kanji-trigger" data-action="kanji-info" data-glyph="${esc(c)}" aria-label="${esc(c)} · ${T('Kanji bilgisi','Kanji information')}">${esc(c)}</button>`:esc(c)).join('');
 }
@@ -8,7 +9,7 @@ export function questionWord(question,event,u,{className='lab-glyph'}={}) {
  const context=revealed&&word&&question.skill==='writing'?word.written:question.context;
  if(!word)return `<div class="${className}" lang="ja">${kanjiText(context,u)}</div>`;
  const visible=revealed||u.showQuestionReadings;
- return `<div class="question-word" data-reading-forced="${revealed}"><div class="${className} ${question.character?.script==='kanji'?'kanji-word':''}" lang="ja">${kanjiText(context,u)}</div><p class="question-reading" lang="ja" ${visible?'':'hidden'}>${context===word.written||context===word.reading?'':`${esc(word.written)}: `}${esc(word.reading)}</p>${revealed?'':`<button type="button" class="reading-hint-button" data-action="reading-hint" aria-pressed="${!!u.showQuestionReadings}">${u.showQuestionReadings?T('Okunuşu gizle','Hide reading'):T('Okunuşu göster','Show reading')}</button>`}</div>`;
+ return `<div class="question-word" data-reading-forced="${revealed}"><div class="${className} ${question.character?.script==='kanji'?'kanji-word':''}" lang="ja">${kanjiText(context,u)}</div><p class="question-reading" lang="ja" ${visible?'':'hidden'}>${context===word.written||context===word.reading?'':`${esc(word.written)}: `}${esc(word.reading)}</p>${revealed?'':`<button type="button" class="reading-hint-button" data-action="reading-hint" aria-pressed="${!!u.showQuestionReadings}">${u.showQuestionReadings?T('Okunuşu gizle','Hide reading'):T('Okunuşu göster','Show reading')}</button>`}${pronunciationControls(word,u,{questionId:question.id,hint:!revealed})}</div>`;
 }
 export function syncReadingHints(u){
  for(const block of document.querySelectorAll('.question-word')){

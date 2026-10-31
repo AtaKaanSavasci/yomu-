@@ -1,6 +1,16 @@
 # Yomu · Japonca çalışma alanı
 
-**0.6.0 · 1 Kasım 2026** — N5–N1 çalışma bantlarında kelimeler, ortama göre cümleler ve gramer. Okunuş ipuçları, kaynaklı kanji bilgileri ve çalışma hatırlatıcısı eklendi.
+**0.7.0 · 1 Kasım 2026** — Kelimelere ücretsiz tarayıcı sesiyle normal ve yavaş dinleme eklendi. N5–N1 çalışma alanları, okunuş ipuçları, kanji bilgileri ve hatırlatıcıyla birlikte çalışır.
+
+## 0.7 · Kelimeleri dinle
+
+Kelime kartlarında, kelime alıştırmalarında, kanji kelime pratiğinde, kaydedilmiş kelimelerin tekrarlarında ve okuma metninin kelime panelinde **Dinle** / **Yavaş dinle** düğmeleri vardır. Kelimenin içerikte kayıtlı kana okunuşu seslendirilir; tek kanjiden otomatik okunuş çıkarılmaz. Örneğin 学校 için がっこう kullanılır. Normal hız 1, yavaş hız 0,65’tir; ses motorunun hız desteği değişebilir. Otomatik çalma yoktur. Çalarken Durdur düğmesi görünür; başka karta/sayfaya geçmek veya uygulamayı arka plana almak sesi keser.
+
+Bu özellik cihazın/tarayıcının sunduğu Japonca sentetik sesi kullanır; ücretli API, servis hesabı veya anahtar eklenmedi. Japonca ses yoksa başka dilde ses kullanılmaz, düğmeler açıklamayla devre dışı kalır. Cihazın seslendirme ayarlarından Japonca ses eklemek ve uygulamayı yeniden açmak gerekebilir. Sesin kalitesi, kullanılabilirliği ve internet ihtiyacı cihaza/motora bağlıdır; çevrimdışı çalışma veya insan kaydı doğruluğu garantisi yoktur. [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis/getVoices).
+
+Soruyu cevaplamadan dinlemek ipucu olarak etiketlenir. Kabul edilen seslendirme isteği oturumda ve sonraki cevapta `pronunciationHintRequested` olarak korunur; bu sesin gerçekten duyulduğunu veya bağımsız hatırlamayı kanıtlamaz. Sesi çalmak yeni cevap, başarı veya dinleme testi üretmez. Mevcut okunuş gizleme tercihi ve yazılmış cevap korunur; geçmiş veriler değiştirilmez.
+
+**64/64 test başarılı.** Japonca ses yokluğu, geç yüklenen sesler, normal/yavaş hız, çakışan/stale geri çağrılar, durdurma, oynatma hatası ve bütün kelime okunuşlarının kana kaynağı doğrulandı. Yerel test tarayıcısında Japonca ses olmadığı için gerçek ses çıkışı ve fiziksel telefon telaffuzu doğrulanamadı. Ses motorunun başarılı akışı kontrollü test motoruyla sınandı. [QA kaydı](docs/qa.md).
 
 ## 0.6 · Okunuş, kanji bilgisi ve hatırlatma
 

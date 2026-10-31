@@ -1,5 +1,13 @@
 # Mimari ve tekrar kararı · 30 Ekim 2026
 
+## 0.7 · Kelime seslendirme
+
+word-speech.js mevcut içerikteki kana okunuşunu NFKC ile normalleştirip doğrular. Kanji/Latin yazımından tahmin yapmaz. Aynı modül kart/quiz denetimlerini üretir ve tek Web Speech oynatıcısını yönetir. Japonca ses bulunmazsa başka dilde sese düşmez. Başarılı seçimde normal 1 veya yavaş 0,65 hız kullanılır. voiceschanged, sonradan yüklenen Japonca seslerle düğmeleri günceller. Kuyruğa alma, başlangıç, bitiş, hata ve iptal durumları ayrı tutulur; revision eski sesin callback’lerinin yeni kelimenin durumunu bozmasını engeller. Utterance tamamlanana kadar referansı korunur.
+
+Mevcut metin seslendirmesi de aynı oynatıcıyı kullanır; bir kelime/metin başlatmak öncekini durdurur. Yeni sayfa/kart çizimi ve pagehide/visibilitychange sesi keser. Düğme durumu ve mesaj yalnızca ilgili DOM alanlarında güncellenir; ses başlatmak veya durdurmak cevap alanını yeniden oluşturmaz. Sentez doğrudan kullanıcı tıklamasında çağrılır; ardından gerekiyorsa ipucu isteği IndexedDB’ye yazılır. Yeni ücretli sağlayıcı, sunucu ses uç noktası veya uygulama ses dosyası yoktur. Cihaz ses motorunun kendi ağ davranışı uygulama tarafından denetlenmez.
+
+Cevap öncesinde kabul edilen oynatma isteği oturumdaki pronunciationHintIds listesine, sonraki olayın pronunciationHintRequested alanına aktarılır. Bu alan teslim/dinleme kanıtı değildir. Kart inceleme ve cevap sonrası dinleme yeni cevap olayı üretmez. Dinleme becerisi hâlâ ölçülmez. Şema 3 ve mevcut veriler korunur; yeni alanlar isteğe bağlıdır.
+
 ## 0.6 · Okunuş, kaynaklı kanji ve hatırlatıcı
 
 reading-ui.js soru/kart yazımını kaçırır ve Han karakterlerini bağımsız erişilebilir düğmelere dönüştürür. Okunuş ipucu güncellemesi yalnızca ilgili satırı/düğmeyi değiştirir; cevap alanı yeniden oluşturulmaz. Cevap sonrası kana her iki sonuçta görünür. Kelime meta verisi study-data/content çözümleyicilerinden gelir; cümle okunuşu otomatik üretilmez. Yeni kelime/tekrar olaylarına readingHintShown eklenir; geçmiş cevaplar değiştirilmez.

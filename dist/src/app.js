@@ -1,3 +1,4 @@
+import {pronunciationControls,pronunciationText,createJapaneseSpeech,syncPronunciationControls} from './word-speech.js';
 import {requestTranslation} from './translation-client.js';
 import {questionWord,syncReadingHints,installKanjiInfo} from './reading-ui.js';
 import {learningSources} from './learning-sources.js';
@@ -27,6 +28,7 @@ const L = obj => obj[state.settings.language];
 const getQuestion=id=>getAnimeQuestion(id,state?.anime.customQuotes)||getContentQuestion(id);
 const ui=()=>({T,L,esc,icon,showQuestionReadings:!!state?.settings.questionReadings});
 const hideKanjiInfo=installKanjiInfo(ui);
+const speechPlayer=createJapaneseSpeech({onChange:()=>updateAudioStatus()});
 const icon = (name, cls = '') => {
   const paths = {
     book: '<path d="M3 5c4-1 6 0 9 2 3-2 5-3 9-2v15c-4-1-6 0-9 2-3-2-5-3-9-2z"/><path d="M12 7v15"/>',
@@ -84,6 +86,7 @@ function focusHeading() { $('#main h1')?.focus({ preventScroll: true }); window.
 function focusStudy(){const el=$('.study-session .answer-input')||$('.study-session input[type="radio"]')||$('#study-stage-title');el?.focus({preventScroll:true});$('.study-session')?.scrollIntoView({block:'start'});}
 function navLink(id, name, label, count = '') { return `<a class="nav-link ${route() === id ? 'active' : ''}" href="#${id}" ${route() === id ? 'aria-current="page"' : ''}>${icon(name)}<span>${label}</span>${count !== '' ? `<span class="nav-count">${count}</span>` : ''}</a>`; }
 function render() {
+  stopAudio();
   hideKanjiInfo();
   clipCleanup?.();clipCleanup=null;
   document.documentElement.lang = state.settings.language;
@@ -97,7 +100,7 @@ function render() {
       ${navLink('today', 'home', T('Bugün', 'Today'))}${navLink('characters','book',T('Harfler','Characters'))}${navLink('vocabulary','leaf',T('Kelimeler','Words'))}${navLink('sentences','book',T('Cümleler','Sentences'))}${navLink('grammar','book',T('Gramer','Grammar'))}${navLink('anime','sound',T('Anime replikleri','Anime lines'))}${navLink('library', 'leaf', T('Okuma köşesi', 'Read'))}${navLink('review', 'repeat', T('Tekrarlarım', 'Reviews'), due)}${navLink('progress', 'chart', T('İlerlemem', 'Progress'))}
     </nav><div class="sidebar-bottom"><div class="quiet-note"><span lang="ja">一歩ずつ。</span><p>${T('Her gün, küçük bir adım.', 'A small step, every day.')}</p></div>${navLink('settings', 'settings', T('Tercihler ve veriler', 'Preferences & data'))}<div class="local-label"><i></i>${T('Bu tarayıcıya kaydedilir', 'Saved in this browser')}</div></div>
   </aside><div class="workspace"><header class="topbar"><span class="top-caption">${T('Kendine biraz Japonca zamanı ayır.', 'Make a little time for Japanese.')}</span><div class="top-controls"><button class="text-size" data-action="large" aria-pressed="${state.settings.largeText}" aria-label="${T('Büyük yazı', 'Large text')}">A<span>A</span></button><div class="language-switch" aria-label="${T('Arayüz dili', 'Interface language')}"><button data-lang="tr" aria-pressed="${state.settings.language === 'tr'}">TR</button><button data-lang="en" aria-pressed="${state.settings.language === 'en'}">EN</button></div><span class="avatar" aria-hidden="true">読</span></div></header>
-    <main id="main" tabindex="-1"><div id="storage-error" class="error-banner" role="alert" hidden></div><div class="date-line"><span>${esc(date)}</span><span class="prototype-tag">${T('JAPONCA ÇALIŞMA ALANI', 'JAPANESE STUDY SPACE')} · 0.6</span></div>${page()}</main>
+    <main id="main" tabindex="-1"><div id="storage-error" class="error-banner" role="alert" hidden></div><div class="date-line"><span>${esc(date)}</span><span class="prototype-tag">${T('JAPONCA ÇALIŞMA ALANI', 'JAPANESE STUDY SPACE')} · 0.7</span></div>${page()}</main>
     <footer><span>yomu · ${T('Küçük metinler, yeni dünyalar.', 'Small texts, new worlds.')}</span><span>${T('Çalışma notları · İnsan editörü onayı bekliyor', 'Study notes · Awaiting human editorial review')}</span></footer></div></div>`;
   $('.top-controls').insertAdjacentHTML('afterbegin', `<button class="translator-trigger" data-action="open-translation" aria-label="${T('Çeviri masasını aç','Open translation desk')}"><span>文</span><span>${T('Çevir','Translate')}</span></button><a class="mobile-settings" href="#settings" aria-label="${T('Tercihler ve veriler', 'Preferences & data')}">${icon('settings')}</a>`);
   if (storageError) showStorageError();
@@ -157,7 +160,7 @@ function lessonPage(id) {
 function wordPanel(lesson) {
   if (!wordById[selectedWord] || !lesson.sentences.some(s => s.tokens.includes(selectedWord))) selectedWord = lesson.words[0];
   const word = wordById[selectedWord], sense = word.senses[0], saved = ['meaning', 'reading'].every(skill => state.skillStates[stateKey(word.id, skill)]);
-  return `<div class="word-panel"><p class="eyebrow">${T('BU BAĞLAMDA', 'IN THIS CONTEXT')}</p><h2 class="word-large" lang="ja">${word.written}</h2><p class="word-reading" lang="ja">${word.readings[0].kana}</p><p class="word-meaning">${esc(sense[state.settings.language])}</p><div class="word-context"><span>${T('Metindeki kullanımı', 'From the text')}</span><p lang="ja">${lesson.sentences.find(s => s.tokens.includes(word.id)).tokens.map(t => wordById[t]?.written || t).join('')}</p></div>${button(`${icon(saved ? 'check' : 'repeat')}${saved ? T('Tekrar listende', 'In your review list') : T('Tekrarıma ekle', 'Save for review')}`, 'save-word', 'secondary full-width', `data-word-id="${word.id}" ${saved ? 'disabled' : ''}`)}<p class="small muted">${T('Anlam ve okunuş için ayrı kartlar.', 'Separate cards for meaning and reading.')}</p></div>`;
+  return `<div class="word-panel"><p class="eyebrow">${T('BU BAĞLAMDA', 'IN THIS CONTEXT')}</p><h2 class="word-large" lang="ja">${word.written}</h2><p class="word-reading" lang="ja">${word.readings[0].kana}</p>${pronunciationControls({written:word.written,reading:word.readings[0].kana},ui())}<p class="word-meaning">${esc(sense[state.settings.language])}</p><div class="word-context"><span>${T('Metindeki kullanımı', 'From the text')}</span><p lang="ja">${lesson.sentences.find(s => s.tokens.includes(word.id)).tokens.map(t => wordById[t]?.written || t).join('')}</p></div>${button(`${icon(saved ? 'check' : 'repeat')}${saved ? T('Tekrar listende', 'In your review list') : T('Tekrarıma ekle', 'Save for review')}`, 'save-word', 'secondary full-width', `data-word-id="${word.id}" ${saved ? 'disabled' : ''}`)}<p class="small muted">${T('Anlam ve okunuş için ayrı kartlar.', 'Separate cards for meaning and reading.')}</p></div>`;
 }
 const skillName = skill => ({ meaning: T('Anlam', 'Meaning'), reading: T('Okunuş', 'Reading'), listening: T('Dinleme', 'Listening'), writing: T('Yazılı cevap', 'Written answer') })[skill];
 function currentQuestion(session) { return session.mode === 'review' ? getQuestion(session.questionId) : getQuestion(questions.filter(q => q.lessonId === session.lessonId)[session.index]?.id); }
@@ -200,26 +203,24 @@ function settingsPage() {
 function openDialog(html) { $('#dialog').innerHTML = html; $('#dialog').showModal(); }
 function setupDialog() { openDialog(`<div class="dialog-heading"><p class="eyebrow">${T('KÜÇÜK BİR BAŞLANGIÇ', 'A LITTLE BEGINNING')}</p><button class="close-dialog" data-action="close-dialog" aria-label="${T('Kapat', 'Close')}">×</button></div><h2>${T('Sana uygun bir ritim.', 'A rhythm that suits you.')}</h2><p class="muted">${T('Bir dakikada ayarla. İstediğin zaman değiştirebilirsin.', 'Set it up in a minute. Change it whenever you like.')}</p><form id="setup-form">${settingsFields()}<p id="settings-validation" role="alert" class="validation"></p><button type="submit" class="btn primary full-width">${T('Bu ritimle başlayalım', 'Let’s start at this pace')}${icon('arrow')}</button></form><button class="subtle-link dialog-skip" data-action="close-dialog">${T('Şimdilik doğrudan örnek dersi keşfet', 'Explore a sample lesson for now')}</button>`); }
 function reportDialog(id) { openDialog(`<div class="dialog-heading"><p class="eyebrow">${T('SORUYA DAİR BİR NOT', 'A NOTE ABOUT THIS QUESTION')}</p><button class="close-dialog" data-action="close-dialog" aria-label="${T('Kapat', 'Close')}">×</button></div><h2>${T('Neyi düzeltmeliyiz?', 'What should we fix?')}</h2><p class="muted">${esc(id)} · ${CONTENT_VERSION}</p><form id="report-form" data-question-id="${id}"><label for="report-description">${T('Hata veya kabul edilmeyen geçerli cevap', 'Error or valid answer that was not accepted')}</label><textarea id="report-description" name="description" rows="5" required maxlength="2000"></textarea><p class="small muted">${T('Bu not yalnızca tarayıcına kaydedilir; dışa aktardığında paylaşabilirsin.', 'This note is saved only in your browser; you can share it by exporting your data.')}</p><button class="btn primary" type="submit">${T('Notu yerel kaydet', 'Save note locally')}${icon('check')}</button></form>`); }
-function voices() { return 'speechSynthesis' in window ? speechSynthesis.getVoices().filter(v => /^ja(?:-|_)/i.test(v.lang)) : []; }
+function voices() { return speechPlayer.voices(); }
 function updateAudioStatus() {
+  const playback=speechPlayer.snapshot();speaking=['queued','speaking'].includes(playback.phase);
+  syncPronunciationControls(document,ui(),speechPlayer);
   const btn = $('[data-action="audio"]');
   if (!btn) return;
   const available = voices().length > 0;
   btn.disabled = !available;
-  btn.querySelector('span').textContent = speaking ? T('Durdur', 'Stop') : T('Sentetik Japonca ses', 'Synthetic Japanese voice');
-  $('#audio-status').textContent = available ? T('Tarayıcı seslendirmesi · İnsan kaydı değil', 'Browser speech · Not a human recording') : T('Bu tarayıcıda Japonca ses bulunamadı.', 'No Japanese voice is available in this browser.');
+  btn.querySelector('span').textContent = speaking && playback.key?.startsWith('lesson:') ? T('Durdur', 'Stop') : T('Sentetik Japonca ses', 'Synthetic Japanese voice');
+  $('#audio-status').textContent = playback.key?.startsWith('lesson:')&&playback.phase==='error'?T('Seslendirme başlatılamadı. Yeniden deneyebilirsin.','Speech could not be played. You can retry.'):available ? T('Tarayıcı seslendirmesi · İnsan kaydı değil', 'Browser speech · Not a human recording') : T('Bu tarayıcıda Japonca ses bulunamadı.', 'No Japanese voice is available in this browser.');
 }
-function stopAudio() { if ('speechSynthesis' in window) speechSynthesis.cancel(); speaking = false; updateAudioStatus(); }
+function stopAudio() { speechPlayer.stop(); }
 function playAudio(id) {
-  if (speaking) { stopAudio(); return; }
-  const voice = voices()[0];
-  if (!voice) { updateAudioStatus(); return; }
+  if (speaking && speechPlayer.snapshot().key===`lesson:${id}`) { stopAudio(); return; }
   const lesson = lessons.find(l => l.id === id);
-  const utterance = new SpeechSynthesisUtterance(lesson.sentences.map(s => s.tokens.map(t => wordById[t]?.written || t).join('')).join(' '));
-  utterance.voice = voice; utterance.lang = 'ja-JP'; utterance.rate = 0.85;
-  utterance.onend = () => { speaking = false; updateAudioStatus(); };
-  utterance.onerror = () => { speaking = false; updateAudioStatus(); toast(T('Seslendirme başlatılamadı.', 'Speech could not be played.')); };
-  speaking = true; updateAudioStatus(); speechSynthesis.speak(utterance);
+  if(!lesson)return;
+  const text=lesson.sentences.map(s=>s.tokens.map(t=>wordById[t]?.written||t).join('')).join(' ');
+  const result=speechPlayer.play({text,key:`lesson:${id}`});if(!result.ok)toast(T('Japonca seslendirme kullanılamıyor.','Japanese speech is unavailable.'));
 }
 async function startLesson(id, restart = false) {
   selectedWord = lessons.find(l => l.id === id)?.words[0] || 'cafe';
@@ -295,6 +296,7 @@ async function drainCharacterInput() {
    const result=applyCharacterInput(state,task.answer,{submitted:task.submitted,questionId:task.questionId,sessionId:task.sessionId,elapsedMs:Math.min(600000,Math.round(performance.now()-questionStarted))});
    if(result.kind==='stale')continue;
    if(result.state===state)continue;
+   if(result.state.events.length>state.events.length)result.state.events.at(-1).pronunciationHintRequested=!!state.practice.session?.pronunciationHintIds?.includes(task.questionId);
    if(result.advanced)task.form.querySelectorAll('input,button').forEach(el=>{el.disabled=true;});
    const saved=await commit(result.state,false);
    if(!saved){if(task.form.isConnected)task.form.querySelectorAll('input,button').forEach(el=>{el.disabled=false;});continue;}
@@ -336,6 +338,17 @@ document.addEventListener('click', async e => {
   if (action === 'close-dialog') { $('#dialog').close(); return; }
   if (action === 'setup') { setupDialog(); return; }
   if (action === 'report') { reportDialog(target.dataset.questionId); return; }
+  if(action==='stop-pronunciation'){stopAudio();return;}
+  if(action==='pronounce'){
+    if(busy)return;const group=target.closest('.word-pronunciation'),text=pronunciationText({reading:group?.dataset.pronunciationReading});if(!text)return;
+    const result=speechPlayer.play({text,key:group.dataset.pronunciationKey,speed:target.dataset.speed});
+    if(!result.ok){updateAudioStatus();return;}
+    if(group.dataset.pronunciationHint==='true'){
+      const next=structuredClone(state),where=route(),session=where==='vocabulary'?next.learning.session:where==='characters'?next.practice.session:where==='review'||where.startsWith('lesson/')?next.session:null;
+      const id=session?.ids?.[session.index]||session?.questionId||(session?.mode==='lesson'?currentQuestion(session)?.id:null);
+      if(session&&!session.feedback&&id===group.dataset.pronunciationQuestion){session.pronunciationHintIds=[...new Set([...(session.pronunciationHintIds||[]),id])];await commit(next,false);}
+    }return;
+  }
   if (action === 'audio') { playAudio(target.dataset.lessonId); return; }
   if(action==='open-translation'){openDialog(`<div class="dialog-heading"><span></span><button class="close-dialog" data-action="close-dialog" aria-label="${T('Kapat','Close')}">×</button></div>${translationBox(translationDraft,ui(),'dialog')}`);return;}
   if(action==='translation-swap'){const text=translationDraft.result || translationDraft.text;invalidateTranslation();[translationDraft.source,translationDraft.target]=[translationDraft.target,translationDraft.source];translationDraft.text=text;syncTranslation();return;}
@@ -426,7 +439,7 @@ document.addEventListener('submit', async e => {
    e.preventDefault();if(busy)return;const s=state.learning.session;if(!s||s.phase!=='exercise'||s.feedback||route()!==s.kind)return;
    const answer=String(new FormData(form).get('answer')||'').trim();if(!answer)return;
    const q=getStudyQuestion(s.ids[s.index]),id=crypto.randomUUID();if(!q)return;
-   const next=recordAnswer(state,q,answer,new Date(),id,Math.min(600000,Math.round(performance.now()-questionStarted)),s.kind);next.learning.session.feedback=id;next.learning.session.eventIds.push(id);next.events.at(-1).readingHintShown=!!state.settings.questionReadings||!!s.readingHintIds?.includes(q.id);
+   const next=recordAnswer(state,q,answer,new Date(),id,Math.min(600000,Math.round(performance.now()-questionStarted)),s.kind);next.learning.session.feedback=id;next.learning.session.eventIds.push(id);next.events.at(-1).readingHintShown=!!state.settings.questionReadings||!!s.readingHintIds?.includes(q.id);next.events.at(-1).pronunciationHintRequested=!!s.pronunciationHintIds?.includes(q.id);
    if(await commit(next))$('.study-session .feedback')?.focus({preventScroll:true});return;
   }
   if(form.dataset.form==='lab-answer' && form.dataset.questionId){e.preventDefault();queueCharacterInput(form,true);return;}
@@ -447,7 +460,7 @@ document.addEventListener('submit', async e => {
     if (!answer) return;
     const q = currentQuestion(state.session), id = crypto.randomUUID();
     const next = recordAnswer(state, q, answer, new Date(), id, Math.min(600000, Math.round(performance.now() - questionStarted)), state.session.mode);
-    next.session.feedback = id; next.session.eventIds.push(id); next.events.at(-1).readingHintShown=!!state.settings.questionReadings||!!state.session.readingHintIds?.includes(q.id);
+    next.session.feedback = id; next.session.eventIds.push(id); next.events.at(-1).readingHintShown=!!state.settings.questionReadings||!!state.session.readingHintIds?.includes(q.id);next.events.at(-1).pronunciationHintRequested=!!state.session.pronunciationHintIds?.includes(q.id);
     if (await commit(next)) { $('.feedback')?.setAttribute('tabindex','-1'); $('.feedback')?.focus(); }
   } else if (form.id === 'settings-form' || form.id === 'setup-form') {
     const timezone = String(data.get('timezone')).trim();
