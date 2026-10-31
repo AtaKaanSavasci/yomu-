@@ -1,5 +1,9 @@
 # Mimari ve tekrar kararı · 30 Ekim 2026
 
+## 0.5.1 · Sunucu kotasında tarayıcı yolu
+
+Gerçek bulut isteğinde sağlayıcı 429/QUOTA döndürürken cihaz bağlantısında 200 görüldü. translation-client.js önce aynı kökendeki API’yi çağırır; yalnızca bu açık kota hatasında, sabit MyMemory /get adresine tarayıcıdan gider. Başka hatalar doğrudan dış isteğe dönüşmez. Bütün doğrudan isteklerde de aynı doğrulama, ara dil, zaman aşımı ve iptal sinyalleri kullanılır. Asıl ortak mantık dist/src/translation-core.js içindedir; scripts/translation-core.mjs uyumluluk dışa aktarımıdır. Worker derlemesi aynı ortak dosyayı gömer.
+
 ## 0.5 · HTTPS üzerinde yayın
 
 Mevcut Node sunucusu yerel kullanım için korunur. translation-core.mjs saf doğrulama/sağlayıcı mantığını tutar; Buffer.byteLength yerine TextEncoder kullanıldığı için Node ve Worker aynı kuralları paylaşır. translation.mjs Node HTTP uyarlamasını ve eski dışa aktarımları korur. worker/index.js Web Request/Response akışını kullanır; beklenen Origin, isteğin HTTPS origin’iyle karşılaştırılır. Çeviri uç noktasında 4000 bayt gövde ve 500 UTF-8 bayt metin sınırı, JSON/yöntem kontrolleri sürer.

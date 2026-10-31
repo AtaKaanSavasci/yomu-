@@ -1,5 +1,13 @@
 # Doğrulama kaydı · 31 Ekim 2026
 
+## 0.5.1 · Canlı erişim ve çeviri düzeltmesi
+
+49/49 test ve Worker derlemesi başarılı. Yeni iki test, sunucu QUOTA cevabında sabit sağlayıcıya tarayıcıdan geçişi ve İngilizce ara dili; başarılı sunucu yanıtında/başka hatada/iptalde gereksiz doğrudan çağrı yapılmamasını doğrular.
+
+İlk yayın Sites tarafından başarılı olarak bildirildi. Canlı HTTP kontrolünde oturumsuz istek 401; Site servis erişimiyle ana sayfa, çalışma modülü ve manifest 200 döndürdü. HTTPS çeviri doğrulaması 400 ile aynı dil çiftini reddetti. Gerçek sağlayıcı isteği bulut sunucusunda 429/QUOTA döndürdü. Cihazdan aynı sağlayıcıya istek 200 ve CORS * döndürdü.
+
+Üretilen Worker yerel test sunucusunda çalıştırıldı; API kasıtlı olarak aynı 429/QUOTA yanıtını verdi. Gerçek uygulama içi tarayıcıda Merhaba girişi MyMemory’ye doğrudan, İngilizce üzerinden gönderildi ve Japonca sonuç alındı. Bu bir çeviri kalitesi değerlendirmesi değildir. Fiziksel telefon veya giriş yapılmış canlı tarayıcı oturumu test edilmedi; canlı sitede hesabın sahibinin ChatGPT girişi gerekir.
+
 ## 0.5 · Çevrimiçi yayın hazırlığı
 
 47/47 otomatik test başarılı. Üç yeni test grubu: Worker statik izin listesi/HEAD/UTF-8/yöntem kontrolleri; HTTPS same-origin çeviri, İngilizce ara dil ve yanlış köken reddi; JSON/yöntem/gövde boyutu hatalarının sağlayıcı çağrısı yapmadan reddi. Önceki karakter, içerik, depolama ve altı çeviri yönü testleri de geçti. Derleme, üretilen Worker’ın default.fetch dışa aktarımını ve ana sayfa/uygulama modülü/manifest için HTTP 200 yanıtını doğruladı.

@@ -9,7 +9,7 @@ for(const dir of ['dist','dist/src'])for(const item of await readdir(resolve(roo
  const path=`${dir}/${item.name}`,url='/'+path.slice(5);assets[url]={type:mime[extname(item.name)],body:await read(path)};
 }
 if(!assets['/index.html']||!assets['/src/app.js'])throw Error('Browser application source is missing');
-const core=await read('scripts/translation-core.mjs');if(/^import\s/m.test(core))throw Error('Translation core must remain self-contained');
+const core=await read('dist/src/translation-core.js');if(/^import\s/m.test(core))throw Error('Translation core must remain self-contained');
 const source=await read('worker/index.js'),importLine="import {translate,TranslationError} from '../scripts/translation-core.mjs';",marker='/* YOMU_BUNDLED_ASSETS */{}';
 if(!source.includes(importLine)||!source.includes(marker))throw Error('Hosted entry point markers changed');
 const manifest=JSON.parse(await read('.openai/hosting.json'));if(!manifest.project_id||manifest.static)throw Error('Use the registered Worker hosting manifest');

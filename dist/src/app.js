@@ -1,3 +1,4 @@
+import {requestTranslation} from './translation-client.js';
 import { lessons, questions, lexemes, wordById, grammarPoints, getQuestion as getContentQuestion, CONTENT_VERSION } from './content.js';
 import { freshState, dayKey, recentDayKeys, recordAnswer, dueStates, addWord, suspendItem, skillSummary, stateKey } from './model.js';
 import { openStore, saveState, ConflictError } from './storage.js';
@@ -244,10 +245,10 @@ async function performTranslation(form) {
   if(translationDraft.error){syncTranslation();return;}
   const request=++translationRequest;translationAbort=new AbortController();translationDraft.busy=true;syncTranslation();
   try{
-    const response=await fetch('/api/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:translationDraft.text,source:translationDraft.source,target:translationDraft.target}),signal:translationAbort.signal});
-    const result=await response.json();if(request!==translationRequest)return;
-    if(!response.ok)translationDraft.error=result.error || 'PROVIDER_ERROR';else {translationDraft.result=result.text;translationDraft.route=result.route || [];}
-  }catch(e){if(request!==translationRequest || e.name==='AbortError')return;translationDraft.error='NETWORK';}
+    const result=await requestTranslation({text:translationDraft.text,source:translationDraft.source,target:translationDraft.target},{signal:translationAbort.signal});
+    if(request!==translationRequest)return;
+    translationDraft.result=result.text;translationDraft.route=result.route || [];
+  }catch(e){if(request!==translationRequest || e.name==='AbortError')return;translationDraft.error=e.code || 'NETWORK';}
   finally{if(request===translationRequest){translationDraft.busy=false;syncTranslation();}}
 }
 function addQuoteDialog() {
