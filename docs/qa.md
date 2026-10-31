@@ -1,5 +1,11 @@
 # Doğrulama kaydı · 31 Ekim 2026
 
+## 0.5 · Çevrimiçi yayın hazırlığı
+
+47/47 otomatik test başarılı. Üç yeni test grubu: Worker statik izin listesi/HEAD/UTF-8/yöntem kontrolleri; HTTPS same-origin çeviri, İngilizce ara dil ve yanlış köken reddi; JSON/yöntem/gövde boyutu hatalarının sağlayıcı çağrısı yapmadan reddi. Önceki karakter, içerik, depolama ve altı çeviri yönü testleri de geçti. Derleme, üretilen Worker’ın default.fetch dışa aktarımını ve ana sayfa/uygulama modülü/manifest için HTTP 200 yanıtını doğruladı.
+
+Bu kayıt yayın öncesi otomatik kontroldür. Gerçek yayın sonucu ve varsa canlı hizmet kontrolleri teslim mesajında belirtilir. Yeni hesap/cihaz eşitlemesi veya fiziksel telefon testi yapıldığı anlamına gelmez. Eski kayıtların bulunduğu Node yerel sunucusu loopback üzerinde korunur.
+
 ## 0.4 · İçerik genişletmesi
 
 44/44 otomatik test ve bütün uygulama/sunucu JS dosyalarının sözdizimi kontrolü başarılı. Önceki kapsam testleri genişletilmiş havuzu baştan sona tarar: 200 kelimenin üç soru türü, 120 cümle ve 50 gramer sorusunun hedef/varyantları, 50 kanji kelimesinin üç soru türü. Yeni testler ham içerik alanlarının tamlığı, boşluk hedefinin tek kez geçmesi, karışık/hiragana/yarım genişlikte okunuşların değerlendirilmesi, kanji kimliklerinin benzersizliği ve 18/34/50 kümülatif kapsamı içindir. Önceki 33 alfabe/model/depolama/çeviri kontrolü de bu toplamın içindedir.

@@ -1,3 +1,7 @@
 node_modules/
 *.log
 work/
+
+# Generated hosted artifact; client files in dist remain source.
+dist/server/
+dist/.openai/

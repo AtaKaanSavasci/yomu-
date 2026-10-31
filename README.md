@@ -1,8 +1,20 @@
 # Yomu · Japonca çalışma alanı
 
-**0.4.0 · 31 Ekim 2026** — N5–N1 çalışma bantlarında kelimeler, ortama göre cümleler ve gramer. Harf pratiği, anime, çeviri, okuma ve kişisel tekrar alanlarıyla birlikte çalışır.
+**0.5.0 · 31 Ekim 2026** — N5–N1 çalışma bantlarında kelimeler, ortama göre cümleler ve gramer. Harf pratiği, anime, çeviri, okuma ve kişisel tekrar alanlarıyla birlikte çalışır.
 
-## Çalıştırma
+## Telefonda ve çevrimiçi kullanım
+
+Yayınlanan Sites adresi HTTPS üzerinden, bilgisayardan bağımsız çalışır. Site hesabın sahibine özeldir; telefonda aynı ChatGPT hesabıyla giriş gerekir. Çalışma alanını Safari veya Chrome’da açıp tarayıcının ana ekrana ekleme seçeneğiyle kısayol oluşturabilirsin. Manifest başlangıç adresi ve uygulama görünümünü tanımlar; çevrimdışı önbellek veya çevrimdışı çalışma garantisi yoktur.
+
+Çalışma kayıtları hâlâ cihazın o tarayıcısındaki IndexedDB’de tutulur. Bilgisayardaki yerel adres ile yeni HTTPS adresi ve telefon arasında otomatik ilerleme eşitlemesi yoktur. Siteye erişim girişi ilerleme eşitlemesi anlamına gelmez. Çeviri ve video için internet gerekir. Site adresi ve yayın durumu teslim mesajında verilir; source deposunun GitHub adresi çalışan uygulamanın adresi değildir.
+
+Sunucu sürümü Worker ESM’dir: aynı kökende POST /api/translate ve yalnızca izin verilen tarayıcı dosyalarını sunar. 200 kelime, 120 cümle, 50 gramer ve 50 kanji kelimesi korunur. Yeni üretim bağımlılığı veya ücretli API anahtarı eklenmedi. Yayın kimliği .openai/hosting.json içinde, erişim anahtarları yalnızca yayın oturumunun belleğindedir.
+
+Geliştirici için **npm run build:hosted**, dist/server/index.js ve dist/.openai/hosting.json üretir. Build, dist altındaki tarayıcı kaynaklarını ve src modüllerini tek Worker’a gömer; Node sunucusu, testler, dokümanlar ve kişisel kayıtlar HTTP üzerinden sunulmaz. Üretilen dosyalar Git’e alınmaz. Yayın paketi Sites source helper ile, doğrulanmış ve aynı kaynaktan üretilmiş commit üzerinden hazırlanır.
+
+**47 test başarılı.** Yeni Worker testleri HTTPS same-origin çeviri, İngilizce ara dil, yanlış köken, gövde/UTF-8 sınırı, hatalı JSON, yöntem ve yalnızca izin verilen statik dosyaların sunulmasını kapsar. Worker derlemesi ana sayfa, uygulama modülü ve manifest yanıtlarını ayrıca doğrular. [QA](docs/qa.md).
+
+## Bilgisayarda yerel çalıştırma
 
 Node.js 22+ gerekir. Windows'ta **Yomu-baslat.cmd** dosyasını çift tıkla veya bu klasörde **npm start** çalıştır. Adres: http://127.0.0.1:4173. Kurulum veya derleme gerekmez. Durdurmak için sunucu penceresinde Ctrl+C kullan.
 
@@ -86,7 +98,7 @@ Gün sınırı seçili IANA saat diliminde 00.00; aralık “1 gün” için ge�
 
 Üretim bağımlılığı yok; HTML/CSS/ES modülleri ve Node HTTP. Tek geliştirme bağımlılığı fake-indexeddb 6.2.7 (Apache-2.0).
 
-**npm ci**, **npm run check**, **npm test**: güncel toplam 44 test. Eski kayıtların taşınması, 208 kana varyantının soru çözümlemesi, bağlamlı kanji, cevap varyantları, anime/kullanıcı soruları, altı çeviri yönü ve hata/kota durumları dahil. [Doğrulama kaydı](docs/qa.md).
+**npm ci**, **npm run check**, **npm test**: güncel toplam 47 test. Eski kayıtların taşınması, 208 kana varyantının soru çözümlemesi, bağlamlı kanji, cevap varyantları, anime/kullanıcı soruları, altı çeviri yönü ve hata/kota durumları dahil. [Doğrulama kaydı](docs/qa.md).
 
 0.2 ana sayfası, karakter seçim ekranı ve çeviri isteği gerçek tarayıcıda açıldı. Sonrasında Computer Use, Chrome adresini güvenilir biçimde doğrulayamadığı için durdu; yeni akışların tümü için mobil/görsel uçtan uca doğrulama tamamlanamadı. docs/qa içindeki önceki üç görsel **0.1 sürümüne aittir**; alphabet-auto-flow.jpg, 0.2.1 alfabe geri bildirim ekranıdır. Bu sınır yeni ekranların tamamı görsel olarak doğrulanmış gibi yorumlanmamalıdır.
 

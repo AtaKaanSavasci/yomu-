@@ -1,5 +1,13 @@
 # Mimari ve tekrar kararı · 30 Ekim 2026
 
+## 0.5 · HTTPS üzerinde yayın
+
+Mevcut Node sunucusu yerel kullanım için korunur. translation-core.mjs saf doğrulama/sağlayıcı mantığını tutar; Buffer.byteLength yerine TextEncoder kullanıldığı için Node ve Worker aynı kuralları paylaşır. translation.mjs Node HTTP uyarlamasını ve eski dışa aktarımları korur. worker/index.js Web Request/Response akışını kullanır; beklenen Origin, isteğin HTTPS origin’iyle karşılaştırılır. Çeviri uç noktasında 4000 bayt gövde ve 500 UTF-8 bayt metin sınırı, JSON/yöntem kontrolleri sürer.
+
+build-hosted.mjs, izin verilen dist kök dosyaları ve dist/src modüllerini tek, bağımsız ES modülüne gömer. Build çıktıları dist/server ve dist/.openai altındadır; mevcut dist kaynakları silinmez ve üretilen çıktı tekrar içine alınmaz. Worker içinde Node modülü veya filesystem çağrısı yoktur. Yalnızca gömülü yollar sunulur; Git metadata’sı, README, testler ve sunucu kaynakları erişilemez. Hosting manifesti kayıtlı Sites proje kimliğini içerir; statik yayın olarak etiketlenmez.
+
+Sites katmanı owner-only erişimi uygular. Uygulama ayrıca hesap/parola/eşitleme servisi kurmaz. Tarayıcı verileri cihaz ve origin’e bağlıdır; bulutta kayıt tutulduğu iddia edilmez. manifest.webmanifest ana ekrana ekleme görünümünü destekler; service worker ve çevrimdışı çalışma kapsam dışıdır.
+
 ## 0.4 ekleri
 
 study-expansion.js özgün ek satırları; kanji-expansion.js 30 yeni bağlam kelimesini içerir. study-data.js eski dizilere ekleme yaparak 200 kelime, 120 cümle, 50 gramer konusu üretir. Eski kimlikler korunur. Kelime okunuşlarında katakananın hiraganaya dönüştürülmüş eşdeğeri de kabul edilir; anlam seçeneği veya kanji karakteri romajiye dönüştürülmez. çalışma paketi sürümü study-2026-10-31.2, karakter paketi characters-2026-10-31.2 olur. Olayların geçmiş içerik sürümleri değiştirilmez. Şema 3 ve veritabanı sürümü 1 kalır.

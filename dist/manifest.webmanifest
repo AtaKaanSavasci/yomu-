@@ -1,0 +1,11 @@
+{
+  "name": "Yomu · Japonca çalışma alanı",
+  "short_name": "Yomu",
+  "lang": "tr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8f9f5",
+  "theme_color": "#2e5948",
+  "icons": [{"src":"/favicon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]
+}
