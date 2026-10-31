@@ -1,5 +1,20 @@
 # Doğrulama kaydı · 31 Ekim 2026
 
+## 0.4 · İçerik genişletmesi
+
+44/44 otomatik test ve bütün uygulama/sunucu JS dosyalarının sözdizimi kontrolü başarılı. Önceki kapsam testleri genişletilmiş havuzu baştan sona tarar: 200 kelimenin üç soru türü, 120 cümle ve 50 gramer sorusunun hedef/varyantları, 50 kanji kelimesinin üç soru türü. Yeni testler ham içerik alanlarının tamlığı, boşluk hedefinin tek kez geçmesi, karışık/hiragana/yarım genişlikte okunuşların değerlendirilmesi, kanji kimliklerinin benzersizliği ve 18/34/50 kümülatif kapsamı içindir. Önceki 33 alfabe/model/depolama/çeviri kontrolü de bu toplamın içindedir.
+
+Gerçek uygulama içi tarayıcıda, ayrı yerel 4176 portunda:
+
+- Ana sayfa 200 kelime / 7 başlık, 120 cümle / 6 ortam ve 50 gramer konusu gösterdi.
+- N5 aile başlığı dört kelime ve kendi ailesinden bahsetme notunu getirdi. 父 kaydetme iki tekrar kartı oluşturdu; 母 → annem seçimi doğru kabul edildi. Yenilemede aynı geri bildirim korundu.
+- Alışveriş başlığı dört yeni N5 cümle getirdi. それをください sorusunda それ doğru kabul edildi.
+- N4 gramerde Türkçe önceden araması yeni ておく konusunu buldu; おき doğru kabul edilip açıklama gösterildi.
+- Kanji havuzu zor düzeyde 50, açıklama 18/34/50 gösterdi. Turdaki 敵 için teki girişi Enter gerektirmeden 1/10 → 2/10 ilerledi.
+- Mobil 390×844 ana sayfa ve 320×740 büyük yazılı yeni aile ekranı incelendi; belge genişliği görünümü aşmadı. İngilizce yeni konu adları, anlam ve açıklamalar açıldı; aynı dar genişlikte taşma görülmedi. Son tarayıcı konsolunda yakalanmış hata yoktu.
+
+Kitap dosyaları sağlanmadığından Genki baskısı/kelime listeleriyle birebir karşılaştırma yapılmadı. İnsan Japonca editörü doğrulaması yapılmadı. Bu sürümde anime oynatıcısı veya gerçek çeviri hizmeti yeniden denenmedi. Test kayıtları yapay ve yereldir; GitHub’a/pakete dahil edilmez.
+
 ## 0.3 · Kelime, cümle ve gramer
 
 Windows, Node.js 26.11.1 ve uygulama içi Chromium. 41/41 otomatik test ve bütün uygulama/sunucu JS dosyalarının sözdizimi kontrolü başarılı. Sekiz yeni test: 60/40/25 içerik sayısı ve tüm düzey/konu/ortam kapsamı; benzersiz kimlikler ve TR/EN örnekler; tüm soru türlerinin tekrar kimlikleriyle çözümlenmesi; tek doğru seçenek; boşluk hedefleri ve varyantları; birleşik filtre/arama; karışık turun 10 soruyla sınırı ve seçki anlık görüntüsü; başarı üretmeden kaydetme ve önceki aralıkları koruma; beceri ayrımı ve yanlışta 10 dakika; şema 2 cevap/harf oturumunun şema 3’te korunması. Önceki alfabe otomatik geçiş testleri de geçti.

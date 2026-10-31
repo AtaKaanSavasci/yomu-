@@ -1,12 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {kanaGroups,defaultPractice,characterPool,createCharacterSession,getCharacterQuestion,characterQuestionId} from '../dist/src/characters.js';
+import {kanaGroups,kanjiWords,defaultPractice,characterPool,createCharacterSession,getCharacterQuestion,characterQuestionId} from '../dist/src/characters.js';
 import {animeQuotes,getAnimeQuestion,safeVideoId,createCustomQuote} from '../dist/src/anime.js';
 import {freshState,hydrateState,gradeAnswer,recordAnswer} from '../dist/src/model.js';
 import {getQuestion} from '../dist/src/content.js';
 test('each kana chart has 46 basic, 25 voiced and 33 contracted entries',()=>{
  for(const [kind,count] of [['basic',46],['voiced',25],['combined',33]])assert.equal(kanaGroups.filter(g=>g.kind===kind).flatMap(g=>g.entries).length,count);
  const keys=kanaGroups.flatMap(g=>g.entries.map(e=>e.key));assert.equal(new Set(keys).size,104);
+});
+test('expanded kanji pool has unique word identities and cumulative levels without replacing old cards',()=>{
+ assert.equal(new Set(kanjiWords.map(w=>w.key)).size,50);
+ for(const [level,size] of [['beginner',18],['intermediate',34],['advanced',50]])assert.equal(characterPool({...defaultPractice(),script:'kanji',level}).length,size);
+ for(const w of kanjiWords){assert.ok(w.word.includes(w.glyph));assert.ok(w.kana&&w.roman&&w.meaning.tr&&w.meaning.en);}
+ for(const id of ['character:reading:kanji-sun','character:writing:kanji-school','character:choice:kanji-word'])assert.equal(getQuestion(id).id,id);
 });
 test('selected rows, difficulty and script constrain the random question pool',()=>{
  const config=defaultPractice();assert.equal(characterPool(config).length,15);
@@ -15,7 +21,7 @@ test('selected rows, difficulty and script constrain the random question pool',(
  config.level='advanced';assert.equal(characterPool(config).length,104);
  config.script='katakana';assert.equal(characterPool(config).find(e=>e.key==='sha').display,'シャ');
  config.groups=[];assert.throws(()=>createCharacterSession(config),/EMPTY_POOL/);
- config.script='kanji';assert.equal(characterPool(config).length,20);
+ config.script='kanji';assert.equal(characterPool(config).length,50);
 });
 test('every generated question resolves from review IDs and has valid choices',()=>{
  for(const script of ['hiragana','katakana','kanji'])for(const mode of ['reading','choice','writing']){

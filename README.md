@@ -1,6 +1,6 @@
 # Yomu · Japonca çalışma alanı
 
-**0.3.0 · 31 Ekim 2026** — N5–N1 çalışma bantlarında kelimeler, ortama göre cümleler ve gramer. Harf pratiği, anime, çeviri, okuma ve kişisel tekrar alanlarıyla birlikte çalışır.
+**0.4.0 · 31 Ekim 2026** — N5–N1 çalışma bantlarında kelimeler, ortama göre cümleler ve gramer. Harf pratiği, anime, çeviri, okuma ve kişisel tekrar alanlarıyla birlikte çalışır.
 
 ## Çalıştırma
 
@@ -10,7 +10,22 @@ Node.js 22+ gerekir. Windows'ta **Yomu-baslat.cmd** dosyasını çift tıkla vey
 
 Dil tercihi, ilerleme, cevaplar ve tekrarlar IndexedDB'de **aynı tarayıcı + aynı adres/port** için saklanır. Farklı portta önceki verilerin görünmemesi silindikleri anlamına gelmez. 0.1/0.2 kayıtları şema 3’e eklemeli olarak taşınır; cevaplar, tercihler ve mevcut harf oturumları korunur.
 
-## 0.3 · Kelime, cümle ve gramer
+## 0.4 · Genişletilmiş içerik
+
+Kelime havuzu **60 → 200**, cümleler **40 → 120**, gramer konuları **25 → 50**, kanji kelime pratiği **20 → 50** oldu. Önceki soruların kimlikleri ve yerel ilerleme korunur; şema 3 değişmez.
+
+- Yedi kelime başlığı: meyveler, eşyalar, yazılım, aile ve insanlar, yiyecek/içecek, zaman/planlar, ulaşım/seyahat. Önceki üç başlıkta her N5–N1 bandında 8; yeni dört başlıkta her bantta 4 kelime. Her kelimede Japonca örnek, kana okunuşu ve TR/EN açıklama var.
+- Altı cümle ortamı: restoran, günlük hayat, iş, arkadaş arası, alışveriş ve yolculuk. Her bant/ortamda 4 cümle; toplam 120. Kullanım notları ve boşluk doldurma cevapları dahil.
+- Her çalışma bandında 10 gramer konusu; toplam 50. Aitlik/varlık, davet, yapabilme, önceden hazırlama, yardım etme/alma, koşul, dolaylı bilgi, güçlü çıkarım ve resmî ileri ifadeler eklendi.
+- Kanji havuzu başlangıçta 18, ortada 34, zor düzeyde 50 kelimeyi kümülatif olarak kapsar. Bu etiketler JLPT bantlarından ayrıdır. Hiragana/katakana tabloları ve doğru cevapta otomatik ilerleme korunur.
+- Kelime okunuş soruları karışık kana, tamamen hiragana ve Unicode normalizasyonuyla yarım genişlikte katakana yazımlarını kabul eder. Örneğin でんしレンジ / でんしれんじ. Romaji bu soruların cevap türü değildir; harf atölyesinde romaji desteği sürer.
+- Ana sayfa ve kanji kapsam sayıları içerikten hesaplanır; yeni içerik eklenince eski sayıda kalmaz.
+
+**44 test başarılı.** Aile kelimesi kaydetme/cevaplama/yenileme, alışveriş cümlesi ve yeni gramer cevabı gerçek tarayıcıda denendi; kanji kapsamı ve otomatik geçiş doğrulandı. Mobil 390 piksel ve 320 piksel büyük yazı/İngilizce kelime ekranı incelendi. [QA kaydı](docs/qa.md).
+
+Kullanıcı elindeki Genki 1/2 kaynaklarının İngilizce–Japonca olduğunu belirtti; kitap dosyaları çalışma alanında yoktu ve baskısı belirlenmedi. Resmî tanıtım yalnızca başlangıç konu kapsamını görmek için incelendi. Yeni örnekler özgün hazırlandı; kitapların kelime, diyalog, alıştırma veya bölüm listelerinin aktarımı değildir. [Kaynak ve içerik notu](docs/sources-v04.md). Düzeyler yaklaşık; Japonca insan editörü onayı yoktur.
+
+## 0.3 · İlk kelime, cümle ve gramer paketi (tarihsel)
 
 - **Kelimeler:** Her N5/N4/N3/N2/N1 bandında meyveler (ilgili tarım/gıda sözcükleri dahil), eşyalar ve yazılım başlıkları. Her başlık ve düzeyde dört kelime: toplam 60. Japonca yazım, kana okunuşu, TR/EN anlamı ve örnek cümle. Anlam seçme, kana okunuşu yazma veya Japonca yazma alıştırmaları.
 - **Cümleler:** Restoranda, günlük hayatta, iş yerinde ve arkadaş arasında; her düzey/ortam için iki örnek: toplam 40. Çeviri, kana okunuşu ve samimi/resmî kullanım notları. Boşluk doldurma pratiği; tanımlı kanji/kana varyantları kabul edilir.
@@ -34,7 +49,7 @@ Yanlış yazımı her tuşta ayrı deneme olarak kaydetmek yerine bir karakterde
 
 - **Bugün:** Harf atölyesi, dört anime alanı ve görünür çeviri masası.
 - **Harfler:** Hiragana/katakana satırlarını seç; zorluk, soru türü ve yazı tipini ayarla. Başlangıç 46 temel kana, orta 71 (dakuten/handakuten dahil), zor 104 (33 birleşik ses dahil). İki yazı sistemi için ayrı karakterler. Bu, Japoncanın bütün küçük/uzatılmış/yabancı ses kombinasyonlarını kapsayan bir müfredat değildir.
-- **Kanji:** Başlangıçta 8, ortada 14, zor düzeyde 20 örnek kelime. Kanjiler kelime bağlamında sorulur. Örneğin 日本 için にほん / nihon ve にっぽん / nippon kabul edilir; bir kanjinin tüm okumaları ölçülmüş sayılmaz.
+- **Kanji:** Başlangıçta 18, ortada 34, zor düzeyde 50 örnek kelime. Kanjiler kelime bağlamında sorulur. Örneğin 日本 için にほん / nihon ve にっぽん / nippon kabul edilir; bir kanjinin tüm okumaları ölçülmüş sayılmaz.
 - **Üç egzersiz türü:** Romajiyle okunuşu yazma; doğru okunuşu seçme; okunuştan Japonca karakter/kelimeyi klavyeyle yazma. El yazısı/vuruş veya telaffuz değerlendirmesi yok. shi/si, chi/ti, tsu/tu gibi tanımlı varyantlar ve uzun ünlü işaretleri desteklenir.
 - Her tur en fazla 10 farklı soru. Cevap gerekçeleri ve tur özeti; yanlışları hemen yeniden çalışma. Soru bazlı yerel sorun notu. Tur ve cevap gerekçesi yenilemede korunur. Ayar değişiklikleri sonraki turu etkiler.
 - **Anime replikleri:** Naruto, Bleach, Vinland Saga ve Jujutsu Kaisen için dört kısa örnek. Anime/zorluk filtreleri, Japonca metin, okunuş, Türkçe/İngilizce çalışma çevirisi, dil notu ve alıştırma. Kendi kısa repliğini ve boşluk cevabını ekleyebilirsin; isteğe bağlı YouTube bağlantısı desteklenir. Kişisel içerik bağımsız doğrulanmış sayılmaz.
@@ -71,11 +86,11 @@ Gün sınırı seçili IANA saat diliminde 00.00; aralık “1 gün” için ge�
 
 Üretim bağımlılığı yok; HTML/CSS/ES modülleri ve Node HTTP. Tek geliştirme bağımlılığı fake-indexeddb 6.2.7 (Apache-2.0).
 
-**npm ci**, **npm run check**, **npm test**: güncel toplam 41 test. Eski kayıtların taşınması, 208 kana varyantının soru çözümlemesi, bağlamlı kanji, cevap varyantları, anime/kullanıcı soruları, altı çeviri yönü ve hata/kota durumları dahil. [Doğrulama kaydı](docs/qa.md).
+**npm ci**, **npm run check**, **npm test**: güncel toplam 44 test. Eski kayıtların taşınması, 208 kana varyantının soru çözümlemesi, bağlamlı kanji, cevap varyantları, anime/kullanıcı soruları, altı çeviri yönü ve hata/kota durumları dahil. [Doğrulama kaydı](docs/qa.md).
 
 0.2 ana sayfası, karakter seçim ekranı ve çeviri isteği gerçek tarayıcıda açıldı. Sonrasında Computer Use, Chrome adresini güvenilir biçimde doğrulayamadığı için durdu; yeni akışların tümü için mobil/görsel uçtan uca doğrulama tamamlanamadı. docs/qa içindeki önceki üç görsel **0.1 sürümüne aittir**; alphabet-auto-flow.jpg, 0.2.1 alfabe geri bildirim ekranıdır. Bu sınır yeni ekranların tamamı görsel olarak doğrulanmış gibi yorumlanmamalıdır.
 
-0.3 dosyaları: dist/src/study-data.js, study-flow.js, study-ui.js, dist/study.css ve tests/study.test.mjs. Başlıca önceki dosyalar: dist/src/characters.js, anime.js, practice-ui.js, media.js; önceki app.js/content.js/model.js/storage.js; scripts/translation.mjs; tests/practice.test.mjs ve translation.test.mjs.
+0.4 içerik ekleri: dist/src/study-expansion.js ve kanji-expansion.js. 0.3 dosyaları: dist/src/study-data.js, study-flow.js, study-ui.js, dist/study.css ve tests/study.test.mjs. Başlıca önceki dosyalar: dist/src/characters.js, anime.js, practice-ui.js, media.js; önceki app.js/content.js/model.js/storage.js; scripts/translation.mjs; tests/practice.test.mjs ve translation.test.mjs.
 
 ## Araştırma ve GitHub
 

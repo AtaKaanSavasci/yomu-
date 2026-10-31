@@ -1,4 +1,5 @@
-export const PRACTICE_VERSION = 'characters-2026-10-30.1';
+import {additionalKanji} from './kanji-expansion.js';
+export const PRACTICE_VERSION = 'characters-2026-10-31.2';
 // Gojūon chart and common Hepburn/Kunrei variants. Original structured data.
 const rows = [
  ['a','basic','あいうえお','a i u e o'], ['k','basic','かきくけこ','ka ki ku ke ko'],
@@ -42,6 +43,7 @@ export const kanjiWords = [
  kanji('hope','希','希望','きぼう','kibou','umut','hope','advanced'),
  kanji('word','言','言葉','ことば','kotoba','söz','word','advanced'),
 ];
+kanjiWords.push(...additionalKanji.map(row=>kanji(...row)));
 export const defaultPractice = () => ({script:'hiragana',level:'beginner',mode:'reading',groups:['a','k','s'],showReadings:true,font:'sans',session:null});
 export const levelKinds = {beginner:['basic'],intermediate:['basic','voiced'],advanced:['basic','voiced','combined']};
 export function groupsFor(level) {return kanaGroups.filter(g => (levelKinds[level] || levelKinds.beginner).includes(g.kind));}

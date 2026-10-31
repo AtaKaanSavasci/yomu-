@@ -1,9 +1,17 @@
 // Original, AI-assisted starter content. Level labels are editorial study bands,
 // not official JLPT vocabulary/grammar lists. No human-editor approval.
-export const STUDY_VERSION='study-2026-10-31.1';
+import {additionalWordRows,additionalSentenceRows,additionalGrammarRows} from './study-expansion.js';
+export const STUDY_VERSION='study-2026-10-31.2';
 export const studyLevels=['N5','N4','N3','N2','N1'];
 export const wordTopics=[{id:'fruits',ja:'果物',tr:'Meyveler',en:'Fruit',note:{tr:'Meyveler ve ilgili tarım/gıda sözcükleri.',en:'Fruit and related agriculture/food words.'}},{id:'objects',ja:'物',tr:'Eşyalar',en:'Objects'},{id:'software',ja:'ソフトウェア',tr:'Yazılım',en:'Software',note:{tr:'Alan terimleri; JLPT müfredatı oldukları iddia edilmez.',en:'Domain terms; not claimed to be JLPT syllabus items.'}}];
 export const sentenceScenes=[{id:'restaurant',ja:'レストラン',tr:'Restoranda',en:'Restaurant'},{id:'daily',ja:'日常',tr:'Günlük hayat',en:'Daily life'},{id:'work',ja:'職場',tr:'İş yerinde',en:'Workplace'},{id:'friends',ja:'友達',tr:'Arkadaş arası',en:'With friends'}];
+wordTopics.push(
+ {id:'family',ja:'家族',tr:'Aile ve insanlar',en:'Family and people',note:{tr:'父/母 gibi biçimler kendi ailenden dışarıya bahsederken kullanılır. Başkasının ailesi için hitap biçimleri değişir.',en:'Forms such as 父/母 refer to your own family when speaking to others. Terms for someone else’s family differ.'}},
+ {id:'food',ja:'食べ物',tr:'Yiyecek ve içecek',en:'Food and drink'},
+ {id:'time',ja:'時間',tr:'Zaman ve planlar',en:'Time and plans'},
+ {id:'travel',ja:'旅行',tr:'Ulaşım ve seyahat',en:'Transport and travel'}
+);
+sentenceScenes.push({id:'shopping',ja:'買い物',tr:'Alışverişte',en:'Shopping'},{id:'travel',ja:'旅行',tr:'Yolculukta',en:'Travelling'});
 const bi=(tr,en)=>({tr,en});
 const wordRows=[
  ['N5','fruits','apple','りんご','りんご','elma','apple','りんごを一つください。','りんごを ひとつ ください。','Bir elma lütfen.','One apple, please.'],
@@ -67,7 +75,7 @@ const wordRows=[
  ['N1','software','redundancy','冗長化','じょうちょうか','yedekli yapılandırma','redundancy','障害に備えてサーバーを冗長化します。','しょうがいに そなえて サーバーを じょうちょうかします。','Arızaya karşı sunucuları yedekli yapılandırırız.','We configure redundant servers in preparation for failures.'],
  ['N1','software','latency','遅延','ちえん','gecikme','latency','応答の遅延を最小限に抑えます。','おうとうの ちえんを さいしょうげんに おさえます。','Yanıt gecikmesini en aza indiririz.','We minimize response latency.'],
 ];
-export const studyWords=wordRows.map(([level,category,key,written,reading,tr,en,ja,kana,exampleTr,exampleEn])=>({id:`w-${key}`,level,category,written,reading,meaning:bi(tr,en),example:{ja,reading:kana,translation:bi(exampleTr,exampleEn)},version:STUDY_VERSION,editorReviewed:false,technical:category==='software',meaningAlternatives:{tr:[],en:[]},writtenAlternatives:[]}));
+export const studyWords=[...wordRows,...additionalWordRows].map(([level,category,key,written,reading,tr,en,ja,kana,exampleTr,exampleEn])=>({id:`w-${key}`,level,category,written,reading,meaning:bi(tr,en),example:{ja,reading:kana,translation:bi(exampleTr,exampleEn)},version:STUDY_VERSION,editorReviewed:false,technical:category==='software',meaningAlternatives:{tr:[],en:[]},writtenAlternatives:[]}));
 const variants={apple:{written:['林檎','リンゴ']},strawberry:{written:['苺','イチゴ']},banana:{written:['ばなな']},grape:{written:['葡萄','ブドウ'],en:['grape']},pear:{tr:['armut'],en:['pear']},watermelon:{written:['西瓜','スイカ']},desk:{tr:['masa']},peel:{tr:['meyve kabuğu']},seed:{tr:['çekirdek']},bug:{tr:['hata','bug'],en:['software bug']},function:{tr:['işlev']},dependency:{tr:['bağımlılık','bağımlılıklar'],en:['dependencies']}};
 for(const w of studyWords){const v=variants[w.id.slice(2)];if(v){w.writtenAlternatives=v.written || [];w.meaningAlternatives={tr:v.tr || [],en:v.en || []};}}
 
@@ -113,7 +121,7 @@ const sentenceRows=[
  ['N1','friends','apology','今さら謝ったところで、約束を破った事実は変わらないよ。','いまさら あやまった ところで、やくそくを やぶった じじつは かわらないよ。','Şimdi özür dilesen de sözünü tutmadığın gerçeği değişmez.','Apologizing now will not change the fact that you broke your promise.','ところで',[],'Sitemkâr; yalnızca dil çözümleme örneği','Reproachful; a language-analysis example'],
  ['N1','friends','again','君ときたら、また鍵を忘れたのか。','きみと きたら、また かぎを わすれたのか。','Sen de var ya, yine mi anahtarı unuttun?','Honestly, you forgot your key again?','ときたら',[],'Çok samimi, eleştirel; herkese söylenmez','Very familiar and critical; not suitable for everyone'],
 ];
-export const studySentences=sentenceRows.map(([level,scene,key,ja,reading,tr,en,target,alternatives,noteTr,noteEn])=>({id:`s-${key}`,level,scene,ja,reading,translation:bi(tr,en),target,answers:[...new Set([target,...alternatives])],note:bi(noteTr,noteEn),version:STUDY_VERSION,editorReviewed:false}));
+export const studySentences=[...sentenceRows,...additionalSentenceRows].map(([level,scene,key,ja,reading,tr,en,target,alternatives,noteTr,noteEn])=>({id:`s-${key}`,level,scene,ja,reading,translation:bi(tr,en),target,answers:[...new Set([target,...alternatives])],note:bi(noteTr,noteEn),version:STUDY_VERSION,editorReviewed:false}));
 
 const grammarRows=[
  ['N5','desu','名詞 + です','İsim cümlesinin kibar sonu','A polite noun sentence','İsimden sonra です, kibar bir yüklem kurar. Bu örnekte kimlik belirtir.','です after a noun makes a polite predicate. Here it states identity.','私は学生です。','わたしは がくせいです。','Ben öğrenciyim.','I am a student.','です',['です']],
@@ -142,7 +150,8 @@ const grammarRows=[
  ['N1','toatte','普通形／名詞 + とあって','Özel bir durumun sonucu','Given a special circumstance','Özel veya dikkat çekici bir durumun doğal sonucunu açıklar.','Explains a natural consequence of a special or notable circumstance.','休日とあって、店は混んでいました。','きゅうじつと あって、みせは こんで いました。','Tatil günü olduğu için dükkân kalabalıktı.','As it was a holiday, the shop was crowded.','とあって',['とあって']],
  ['N1','beku','動詞辞書形 + べく','Bir amaç doğrultusunda','In order to, formal','Amaç için resmî/yazılı bir ifadedir. する için するべく ve すべく biçimleri bulunur.','A formal or written expression of purpose. する can appear as するべく or すべく.','問題を解決すべく、話し合いを続けています。','もんだいを かいけつすべく、はなしあいを つづけて います。','Sorunu çözmek için görüşmeleri sürdürüyoruz.','We are continuing discussions in order to solve the problem.','べく',['べく']],
 ];
-export const studyGrammar=grammarRows.map(([level,key,form,tr,en,noteTr,noteEn,ja,reading,exampleTr,exampleEn,target,answers])=>({id:`g-${key}`,level,form,title:bi(tr,en),explanation:bi(noteTr,noteEn),example:{ja,reading,translation:bi(exampleTr,exampleEn)},target,answers,version:STUDY_VERSION,editorReviewed:false}));
+export const studyGrammar=[...grammarRows,...additionalGrammarRows].map(([level,key,form,tr,en,noteTr,noteEn,ja,reading,exampleTr,exampleEn,target,answers])=>({id:`g-${key}`,level,form,title:bi(tr,en),explanation:bi(noteTr,noteEn),example:{ja,reading,translation:bi(exampleTr,exampleEn)},target,answers,version:STUDY_VERSION,editorReviewed:false}));
+export const studyStats={words:studyWords.length,sentences:studySentences.length,grammar:studyGrammar.length,topics:wordTopics.length,scenes:sentenceScenes.length};
 export function defaultLearning(){return {vocabulary:{level:'N5',category:'fruits',search:'',selectedId:'w-apple',mode:'meaning',showReading:true},sentences:{level:'N5',category:'restaurant',search:'',selectedId:'s-menu',showReading:true},grammar:{level:'N5',category:'all',search:'',selectedId:'g-desu',showReading:true},session:null};}
 export const studyCollection=kind=>({vocabulary:studyWords,sentences:studySentences,grammar:studyGrammar})[kind] || [];
 export function filterStudyItems(kind,config){const query=String(config.search || '').trim().toLocaleLowerCase('tr-TR');return studyCollection(kind).filter(item=>(config.level==='all'||item.level===config.level)&&(config.category==='all'||(kind==='vocabulary'?item.category:kind==='sentences'?item.scene:'all')===config.category)&&(!query||JSON.stringify([item.written,item.reading,item.meaning,item.ja,item.translation,item.form,item.title,item.explanation,item.example,item.note]).toLocaleLowerCase('tr-TR').includes(query)));}
@@ -151,7 +160,8 @@ export function getStudyQuestion(id){
  const [,kind,itemId,mode]=match,item=studyCollection(kind).find(i=>i.id===itemId);if(!item)return null;
  const base={id,itemId:`study-${item.id}`,version:STUDY_VERSION,responseType:'typed',studyKind:kind};
  if(kind==='vocabulary'){
-  const answers=mode==='reading'?[item.reading]:mode==='writing'?[item.written,item.reading,...item.writtenAlternatives]:null;
+  const kanaAnswers=[...new Set([item.reading,item.reading.replace(/[ァ-ヶ]/gu,c=>String.fromCharCode(c.charCodeAt(0)-0x60))])];
+  const answers=mode==='reading'?kanaAnswers:mode==='writing'?[...new Set([item.written,...kanaAnswers,...item.writtenAlternatives])]:null;
   const q={...base,skill:mode==='meaning'?'meaning':mode==='reading'?'reading':'writing',context:mode==='writing'?item.reading:item.written,prompt:mode==='meaning'?bi('Bu kelimenin anlamını seç.','Choose the meaning of this word.'):mode==='reading'?bi('Okunuşunu kana ile yaz.','Type the reading in kana.'):bi(`“${item.meaning.tr}” kelimesini Japonca yaz.`, `Write “${item.meaning.en}” in Japanese.`),answers:mode==='meaning'?{tr:[item.meaning.tr,...item.meaningAlternatives.tr],en:[item.meaning.en,...item.meaningAlternatives.en]}:{tr:answers,en:answers},explanation:bi(`${item.written} → ${item.reading} · ${item.meaning.tr}`,`${item.written} → ${item.reading} · ${item.meaning.en}`)};
   if(mode==='meaning'){q.responseType='choice';q.choices={};for(const lang of ['tr','en']){const options=[item.meaning[lang]];for(const other of [...studyWords.filter(w=>w.category===item.category&&w.level===item.level),...studyWords.filter(w=>w.category===item.category),...studyWords]){const value=other.meaning[lang];if(!q.answers[lang].some(a=>a.toLowerCase()===value.toLowerCase())&&!options.includes(value))options.push(value);if(options.length===4)break;}const offset=studyWords.indexOf(item)%4;q.choices[lang]=options.slice(offset).concat(options.slice(0,offset));}}return q;
  }

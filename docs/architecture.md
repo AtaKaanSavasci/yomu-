@@ -1,5 +1,11 @@
 # Mimari ve tekrar kararı · 30 Ekim 2026
 
+## 0.4 ekleri
+
+study-expansion.js özgün ek satırları; kanji-expansion.js 30 yeni bağlam kelimesini içerir. study-data.js eski dizilere ekleme yaparak 200 kelime, 120 cümle, 50 gramer konusu üretir. Eski kimlikler korunur. Kelime okunuşlarında katakananın hiraganaya dönüştürülmüş eşdeğeri de kabul edilir; anlam seçeneği veya kanji karakteri romajiye dönüştürülmez. çalışma paketi sürümü study-2026-10-31.2, karakter paketi characters-2026-10-31.2 olur. Olayların geçmiş içerik sürümleri değiştirilmez. Şema 3 ve veritabanı sürümü 1 kalır.
+
+studyStats ve characterPool üzerinden görünen sayıların veri kaynağından türetilmesi, kitaplık büyüdükçe ekranda eski sabit sayıların kalmasını önler. N5–N1 etiketleri yaklaşık çalışma bantları; harf atölyesindeki başlangıç/orta/zor ise ayrı, kümülatif seçimlerdir. Yeni içerik tamamen yerel çalışır; yayıncı içeriği indirme/servis bağımlılığı eklenmez.
+
 ## 0.3 ekleri
 
 Güncel durum şema 3’tür; IndexedDB sürümü 1 kalır. learning alanında vocabulary/sentences/grammar için ayrı düzey, konu/ortam, arama, seçili kart ve okunuş tercihleri bulunur. Bir ortak çalışma oturumu, başlarken karıştırılmış en fazla 10 soru kimliğini saklar; filtreler değişince bu oturum sessizce değişmez. Yeni tur açıkça başlatılır. Şema 1/2 kayıtları derin varsayılan birleştirmesiyle taşınır; cevaplar, tekrar aralıkları ve harf/anime oturumları korunur.

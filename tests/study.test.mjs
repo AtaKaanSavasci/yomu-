@@ -4,14 +4,29 @@ import {studyLevels,wordTopics,sentenceScenes,studyWords,studySentences,studyGra
 import {freshState,hydrateState,gradeAnswer,recordAnswer,dueStates} from '../dist/src/model.js';
 import {getQuestion} from '../dist/src/content.js';
 import {createStudySession,saveStudyItem,selectStudyConfig} from '../dist/src/study-flow.js';
+import {additionalWordRows,additionalSentenceRows,additionalGrammarRows} from '../dist/src/study-expansion.js';
 const now=new Date('2026-10-31T12:00:00Z');
 
+test('expanded rows have complete fields, valid bands and unambiguous gap targets',()=>{
+ for(const [rows,size] of [[additionalWordRows,11],[additionalSentenceRows,11],[additionalGrammarRows,13]])for(const row of rows){
+  assert.equal(row.length,size);assert.ok(studyLevels.includes(row[0]));assert.ok(row.every(v=>Array.isArray(v)||typeof v==='string'&&v.trim()));
+ }
+ for(const row of additionalSentenceRows)assert.equal(row[3].split(row[7]).length-1,1);
+ for(const row of additionalGrammarRows)assert.equal(row[7].split(row[11]).length-1,1);
+});
+test('kana reading answers accept mixed script, all hiragana and halfwidth katakana',()=>{
+ const q=getQuestion('study:vocabulary:w-microwave:reading');
+ for(const answer of ['でんしレンジ','でんしれんじ','でんしﾚﾝｼﾞ'])assert.ok(gradeAnswer(q,answer,'tr'));
+ assert.equal(gradeAnswer(q,'denshi renji','tr'),false);
+ assert.ok(gradeAnswer(getQuestion('study:vocabulary:w-keyboard:reading'),'きーぼーど','en'));
+});
+
 test('starter content covers each requested level, topic and setting with bilingual examples',()=>{
- assert.equal(studyWords.length,60);assert.equal(studySentences.length,40);assert.equal(studyGrammar.length,25);
+ assert.equal(studyWords.length,200);assert.equal(studySentences.length,120);assert.equal(studyGrammar.length,50);
  for(const level of studyLevels){
-  for(const topic of wordTopics)assert.equal(studyWords.filter(i=>i.level===level&&i.category===topic.id).length,4);
-  for(const scene of sentenceScenes)assert.equal(studySentences.filter(i=>i.level===level&&i.scene===scene.id).length,2);
-  assert.equal(studyGrammar.filter(i=>i.level===level).length,5);
+  for(const topic of wordTopics)assert.equal(studyWords.filter(i=>i.level===level&&i.category===topic.id).length,['fruits','objects','software'].includes(topic.id)?8:4);
+  for(const scene of sentenceScenes)assert.equal(studySentences.filter(i=>i.level===level&&i.scene===scene.id).length,4);
+  assert.equal(studyGrammar.filter(i=>i.level===level).length,10);
  }
  const all=[...studyWords,...studySentences,...studyGrammar];assert.equal(new Set(all.map(i=>i.id)).size,all.length);
  for(const i of all){assert.equal(i.editorReviewed,false);assert.ok(i.version);const ex=i.example||i;assert.ok(ex.ja&&ex.reading&&ex.translation.tr&&ex.translation.en);}
@@ -35,18 +50,18 @@ test('every sentence and grammar gap hides a present target and accepts its expl
  }
 });
 test('filters combine level and category with Japanese, Turkish and English search',()=>{
- assert.equal(filterStudyItems('vocabulary',{level:'N3',category:'software',search:''}).length,4);
+ assert.equal(filterStudyItems('vocabulary',{level:'N3',category:'software',search:''}).length,8);
  assert.deepEqual(filterStudyItems('vocabulary',{level:'all',category:'all',search:'ŞARJ'}).map(i=>i.id),['w-charger']);
  assert.ok(filterStudyItems('vocabulary',{level:'all',category:'software',search:'変数'}).some(i=>i.id==='w-variable'));
- assert.equal(filterStudyItems('sentences',{level:'N1',category:'work',search:''}).length,2);
- assert.equal(filterStudyItems('grammar',{level:'N4',category:'all',search:''}).length,5);
+ assert.equal(filterStudyItems('sentences',{level:'N1',category:'work',search:''}).length,4);
+ assert.equal(filterStudyItems('grammar',{level:'N4',category:'all',search:''}).length,10);
  assert.equal(filterStudyItems('vocabulary',{level:'N5',category:'fruits',search:'nonexistent'}).length,0);
 });
 test('practice snapshots only filtered questions, shuffles and caps a round at ten distinct cards',()=>{
  const cfg={level:'all',category:'software',search:'',mode:'reading'},s=createStudySession('vocabulary',cfg,()=>0,'round');
  assert.equal(s.ids.length,10);assert.equal(new Set(s.ids).size,10);assert.ok(s.ids.every(id=>getQuestion(id).skill==='reading'));
  assert.equal(createStudySession('vocabulary',{...cfg,search:'nonexistent'}),null);
- assert.equal(createStudySession('sentences',{level:'N5',category:'friends',search:''}).ids.length,2);
+ assert.equal(createStudySession('sentences',{level:'N5',category:'friends',search:''}).ids.length,4);
  const state=freshState();state.learning.session=s;const next=selectStudyConfig(state,'vocabulary',{level:'N1',category:'objects'});
  assert.deepEqual(next.learning.session,s);assert.ok(filterStudyItems('vocabulary',next.learning.vocabulary).some(i=>i.id===next.learning.vocabulary.selectedId));assert.equal(state.learning.vocabulary.level,'N5');
 });
