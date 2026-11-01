@@ -1,6 +1,12 @@
 # Yomu · Japonca çalışma alanı
 
-**0.7.0 · 1 Kasım 2026** — Kelimelere ücretsiz tarayıcı sesiyle normal ve yavaş dinleme eklendi. N5–N1 çalışma alanları, okunuş ipuçları, kanji bilgileri ve hatırlatıcıyla birlikte çalışır.
+**0.7.1 · 2 Kasım 2026** — Seçim tablolarının kaydırma konumu korunur. Kelime seslendirmesi, N5–N1 çalışma alanları, okunuş ipuçları, kanji bilgileri ve hatırlatıcıyla birlikte çalışır.
+
+## 0.7.1 · Seçerken bulunduğun yerde kal
+
+Hiragana/katakana satırlarını seçmek veya kaldırmak tabloyu başa döndürmez. Aynı sayfanın yeniden çizilmesinde tablo ve sayfa kaydırması, açık/kapalı satır alanı ve klavye odağı korunur. Kelime, cümle ve gramer listelerinde de seçimden sonra liste başına veya kart ayrıntısına otomatik atlama kaldırıldı. Yeni sayfaya geçiş ve alıştırmayı başlatma gibi açık gezinme eylemleri kendi normal davranışını sürdürür.
+
+67/67 test başarılı. Mobilde uzun hiragana/katakana tablosu, üç içerik listesi, klavyeyle seçim; ayrıca 320 piksel büyük yazı ve masaüstü kontrol edildi. [QA kaydı](docs/qa.md).
 
 ## 0.7 · Kelimeleri dinle
 

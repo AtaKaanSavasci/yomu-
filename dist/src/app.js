@@ -1,3 +1,4 @@
+import {captureView,restoreView} from './view-state.js';
 import {pronunciationControls,pronunciationText,createJapaneseSpeech,syncPronunciationControls} from './word-speech.js';
 import {requestTranslation} from './translation-client.js';
 import {questionWord,syncReadingHints,installKanjiInfo} from './reading-ui.js';
@@ -18,7 +19,7 @@ import {getStudyQuestion,defaultLearning} from './study-data.js';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 let state, busy = false, storageError = '', selectedWord = 'cafe', questionStarted = performance.now(), speaking = false;
-let clipCleanup=null;
+let clipCleanup=null,renderedRoute=null;
 const translationDraft={source:'tr',target:'ja',text:'',result:'',error:'',busy:false,route:[]};
 let translationRequest=0,translationAbort;
 let pendingCharacterInput=null,processingCharacterInput=false;
@@ -86,6 +87,7 @@ function focusHeading() { $('#main h1')?.focus({ preventScroll: true }); window.
 function focusStudy(){const el=$('.study-session .answer-input')||$('.study-session input[type="radio"]')||$('#study-stage-title');el?.focus({preventScroll:true});$('.study-session')?.scrollIntoView({block:'start'});}
 function navLink(id, name, label, count = '') { return `<a class="nav-link ${route() === id ? 'active' : ''}" href="#${id}" ${route() === id ? 'aria-current="page"' : ''}>${icon(name)}<span>${label}</span>${count !== '' ? `<span class="nav-count">${count}</span>` : ''}</a>`; }
 function render() {
+  const currentRoute=route(),view=currentRoute===renderedRoute?captureView($('#app')):null;
   stopAudio();
   hideKanjiInfo();
   clipCleanup?.();clipCleanup=null;
@@ -94,17 +96,18 @@ function render() {
   document.title = T('Yomu · Japonca çalışma alanı', 'Yomu · Japanese study space');
   const due = dueStates(state).length;
   const date = new Intl.DateTimeFormat(state.settings.language === 'tr' ? 'tr-TR' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: state.settings.timezone }).format(new Date());
-  $('#app').innerHTML = `<div class="shell"><aside class="sidebar"><a href="#today" class="brand" aria-label="Yomu">${icon('book')}<span>yomu<span class="brand-jp" lang="ja">読む</span></span></a>
+  $('#app').innerHTML = `<div class="shell"><aside class="sidebar" data-scroll-key="navigation"><a href="#today" class="brand" aria-label="Yomu">${icon('book')}<span>yomu<span class="brand-jp" lang="ja">読む</span></span></a>
     <div class="space-label">${T('JAPONCA ÇALIŞMA ALANIN', 'YOUR JAPANESE STUDY SPACE')}</div>
     <nav aria-label="${T('Ana menü', 'Main navigation')}">
       ${navLink('today', 'home', T('Bugün', 'Today'))}${navLink('characters','book',T('Harfler','Characters'))}${navLink('vocabulary','leaf',T('Kelimeler','Words'))}${navLink('sentences','book',T('Cümleler','Sentences'))}${navLink('grammar','book',T('Gramer','Grammar'))}${navLink('anime','sound',T('Anime replikleri','Anime lines'))}${navLink('library', 'leaf', T('Okuma köşesi', 'Read'))}${navLink('review', 'repeat', T('Tekrarlarım', 'Reviews'), due)}${navLink('progress', 'chart', T('İlerlemem', 'Progress'))}
     </nav><div class="sidebar-bottom"><div class="quiet-note"><span lang="ja">一歩ずつ。</span><p>${T('Her gün, küçük bir adım.', 'A small step, every day.')}</p></div>${navLink('settings', 'settings', T('Tercihler ve veriler', 'Preferences & data'))}<div class="local-label"><i></i>${T('Bu tarayıcıya kaydedilir', 'Saved in this browser')}</div></div>
   </aside><div class="workspace"><header class="topbar"><span class="top-caption">${T('Kendine biraz Japonca zamanı ayır.', 'Make a little time for Japanese.')}</span><div class="top-controls"><button class="text-size" data-action="large" aria-pressed="${state.settings.largeText}" aria-label="${T('Büyük yazı', 'Large text')}">A<span>A</span></button><div class="language-switch" aria-label="${T('Arayüz dili', 'Interface language')}"><button data-lang="tr" aria-pressed="${state.settings.language === 'tr'}">TR</button><button data-lang="en" aria-pressed="${state.settings.language === 'en'}">EN</button></div><span class="avatar" aria-hidden="true">読</span></div></header>
-    <main id="main" tabindex="-1"><div id="storage-error" class="error-banner" role="alert" hidden></div><div class="date-line"><span>${esc(date)}</span><span class="prototype-tag">${T('JAPONCA ÇALIŞMA ALANI', 'JAPANESE STUDY SPACE')} · 0.7</span></div>${page()}</main>
+    <main id="main" tabindex="-1"><div id="storage-error" class="error-banner" role="alert" hidden></div><div class="date-line"><span>${esc(date)}</span><span class="prototype-tag">${T('JAPONCA ÇALIŞMA ALANI', 'JAPANESE STUDY SPACE')} · 0.7.1</span></div>${page()}</main>
     <footer><span>yomu · ${T('Küçük metinler, yeni dünyalar.', 'Small texts, new worlds.')}</span><span>${T('Çalışma notları · İnsan editörü onayı bekliyor', 'Study notes · Awaiting human editorial review')}</span></footer></div></div>`;
   $('.top-controls').insertAdjacentHTML('afterbegin', `<button class="translator-trigger" data-action="open-translation" aria-label="${T('Çeviri masasını aç','Open translation desk')}"><span>文</span><span>${T('Çevir','Translate')}</span></button><a class="mobile-settings" href="#settings" aria-label="${T('Tercihler ve veriler', 'Preferences & data')}">${icon('settings')}</a>`);
   if (storageError) showStorageError();
   updateAudioStatus();
+  restoreView($('#app'),view);renderedRoute=currentRoute;
 }
 function page() {
   const r = route();
@@ -152,7 +155,7 @@ function lessonPage(id) {
   if (session?.lessonId === id && session.phase === 'done') return completionPage(lesson, session);
   const grammar = grammarPoints.find(g => g.id === lesson.grammarId);
   return `<a href="#library" class="back-link">← ${T('Okuma köşesi', 'Reading corner')}</a><div class="lesson-heading"><div><p class="eyebrow">${T('KISA OKUMA', 'SHORT READING')} ${lesson.number} · ${lesson.minutes} ${T('DAKİKA', 'MINUTES')}</p><h1 tabindex="-1">${esc(L(lesson.title))}</h1><p class="muted">${esc(L(lesson.takeaway))}</p></div><span class="level-pill">${T('Kana sonrası', 'After kana')}</span></div>
-  <div class="stepper"><span class="current">01 ${T('Oku ve keşfet', 'Read & discover')}</span><span>02 ${T('Kendin dene', 'Try it yourself')}</span><span>03 ${T('Yanında götür', 'Take it with you')}</span></div>
+  <div class="stepper" data-scroll-key="lesson-steps"><span class="current">01 ${T('Oku ve keşfet', 'Read & discover')}</span><span>02 ${T('Kendin dene', 'Try it yourself')}</span><span>03 ${T('Yanında götür', 'Take it with you')}</span></div>
   <div class="reader-grid"><section class="reading-paper"><div class="reader-controls">${toggle('Furigana', 'furigana')}${toggle(T('Açıklamalar', 'Explanations'), 'explanations')}${toggle(T('Çeviri', 'Translation'), 'translation')}</div><div class="story-content"><span class="story-label" lang="ja">${lesson.japaneseTitle}</span>${lesson.sentences.map(s => `<div class="sentence"><p class="japanese" lang="ja">${s.tokens.map(renderToken).join('')}</p>${state.settings.translation ? `<p class="translation">${esc(L(s.translation))}</p>` : ''}</div>`).join('')}</div><div class="audio-row"><button class="audio-button" data-action="audio" data-lesson-id="${id}" disabled>${icon('sound')}<span>${T('Ses denetleniyor', 'Checking audio')}</span></button><span id="audio-status" class="small muted"></span></div><div class="reader-bottom"><span class="small muted">${T('Altı çizili bir kelimeyi seçerek keşfet.', 'Select an underlined word to explore.')}</span>${button(`${T('Kendin dene', 'Try it yourself')}${icon('arrow')}`, 'practice', 'primary', `data-lesson-id="${id}"`)}</div></section>
   <aside class="context-panel">${state.settings.explanations ? wordPanel(lesson) : `<div class="context-placeholder">${icon('book')}<h2>${T('Kendi başına oku.', 'Read on your own.')}</h2><p>${T('Bir ipucu gerektiğinde açıklamaları açabilirsin.', 'Turn explanations on whenever you need a clue.')}</p></div>`}<div class="grammar-note"><p class="eyebrow">${T('GRAMER MERCEĞİ', 'GRAMMAR LENS')}</p><span class="grammar-form" lang="ja">${grammar.form}</span><h3>${esc(L(grammar.title))}</h3>${state.settings.explanations ? `<p>${esc(L(grammar.explanation))}</p>` : `<p class="muted">${T('Açıklamalar kapalı.', 'Explanations are off.')}</p>`}</div></aside></div>
   <div class="lesson-foot"><span class="small muted">${T('Örnek içerik · Editör onayı yok · Gerçek ses kaydı yok', 'Sample content · Not editor approved · No recorded audio')}</span><button class="subtle-link" data-action="skip-lesson" data-lesson-id="${id}">${T('Bu metni biliyorum · Atla', 'I know this text · Skip')} →</button></div>`;
@@ -381,7 +384,7 @@ document.addEventListener('click', async e => {
    const kind=target.dataset.kind,changes=action==='study-level'?{level:target.dataset.level}:action==='study-clear'?{search:''}:defaultLearning()[kind];
    if(await commit(selectStudyConfig(state,kind,changes))){const focus=action==='study-level'?`[data-action="study-level"][data-level="${target.dataset.level}"]`:'#study-search';$(focus)?.focus({preventScroll:true});}return;
   }
-  if(action==='study-select'){next.learning[target.dataset.kind].selectedId=target.dataset.item;if(await commit(next))$('.study-detail h2')?.scrollIntoView({block:'nearest'});return;}
+  if(action==='study-select'){next.learning[target.dataset.kind].selectedId=target.dataset.item;await commit(next);return;}
   if(action==='study-save'){if(await commit(saveStudyItem(state,target.dataset.kind,target.dataset.item)))toast(T('Tekrar listene eklendi. Başarı kaydı eklenmedi.','Saved for review. No success was recorded.'));return;}
   if(action==='study-start'){const kind=target.dataset.kind;next.learning.session=createStudySession(kind,next.learning[kind]);if(!next.learning.session)return;if(await commit(next)){questionStarted=performance.now();focusStudy();}return;}
   if(action==='study-close'){next.learning.session=null;await commit(next);return;}

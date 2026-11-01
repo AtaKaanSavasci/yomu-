@@ -1,5 +1,9 @@
 # Mimari ve tekrar kararı · 30 Ekim 2026
 
+## 0.7.1 · Aynı sayfada görünümün korunması
+
+view-state.js, render öncesinde data-scroll-key ile işaretlenen panellerin iki eksendeki kaydırmasını, data-disclosure-key ile işaretlenen details durumunu, sayfa konumunu ve uygulama içindeki odak kimliğini yakalar. Yeniden çizimden sonra önce açıklık/odak, sonra paneller ve sayfa kaydırması anlık olarak geri yüklenir. Odak preventScroll ile ve kendi tablo kapsamı içinde eşleştirilir. Kaldırılan/devre dışı öğeler sessizce atlanır. Yeni rotaya geçişte eski sayfanın görünümü taşınmaz. Görünüm verisi IndexedDB’ye yazılmaz; cevaplar ve çalışma seçimi normal kalıcı kayıt akışında kalır. study-select artık ayrıntı başlığına scrollIntoView çağırmaz; kullanıcı liste içinde seçim yapmaya devam edebilir.
+
 ## 0.7 · Kelime seslendirme
 
 word-speech.js mevcut içerikteki kana okunuşunu NFKC ile normalleştirip doğrular. Kanji/Latin yazımından tahmin yapmaz. Aynı modül kart/quiz denetimlerini üretir ve tek Web Speech oynatıcısını yönetir. Japonca ses bulunmazsa başka dilde sese düşmez. Başarılı seçimde normal 1 veya yavaş 0,65 hız kullanılır. voiceschanged, sonradan yüklenen Japonca seslerle düğmeleri günceller. Kuyruğa alma, başlangıç, bitiş, hata ve iptal durumları ayrı tutulur; revision eski sesin callback’lerinin yeni kelimenin durumunu bozmasını engeller. Utterance tamamlanana kadar referansı korunur.

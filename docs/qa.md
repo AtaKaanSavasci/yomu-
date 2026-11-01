@@ -1,4 +1,15 @@
-# Doğrulama kaydı · 1 Kasım 2026
+# Doğrulama kaydı · 2 Kasım 2026
+
+## 0.7.1 · Seçim tablolarında kaydırma
+
+67/67 test ve JavaScript sözdizimi kontrolü başarılı. Üç yeni test, değiştirilmiş DOM üzerinde çoklu tablo kaydırması ve sayfa konumu; tablo kapsamında doğru odağın preventScroll ile bulunması ve açıklık durumunun art arda korunması; kaldırılan tablolar ve uygulama dışındaki odak durumunu doğrular.
+
+Gerçek uygulama içi tarayıcıda ayrı yerel 4182 adresinde:
+
+- 390×844 zor hiragana tablosunda ky satırını seçme/kaldırma ve klavyeyle seçim denendi. Kararlı başlangıçta tablo scrollTop 953 ve sayfa 550, seçimden sonra aynı kaldı; odak ky üzerinde korundu.
+- Kelime listesinde son satırdan önceki パイナップル seçilirken liste 429, sayfa 1380 olarak korundu. Cümle listesinde önceki お会計をお願いします。 satırına geçişte liste 89 olarak kaldı; sayfa konumunda 1 piksel yuvarlama farkı görüldü. Gramerde önceki kibar davet satırını seçerken liste 599 ve sayfa 1038 değişmedi.
+- 320×740 büyük yazı katakana tablosunda doğrudan klavye seçimiyle tablo 937, sayfa 800; masaüstünde de aynı değerler korundu. Test aracının görünmeyen öğeyi tıklamadan önce otomatik görünür alana getirmesi ile uygulamanın seçim sonrası kaydırması birbirinden ayrılarak ölçüldü.
+- Yakalanmış konsol hatası/uyarısı yoktu. Fiziksel telefon ve ekran okuyucu testi yapılmadı; tarayıcıdaki mobil görünüm ve klavye kullanıldı.
 
 ## 0.7 · Kelimelerin sesli okunuşu
 
