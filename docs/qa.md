@@ -1,4 +1,24 @@
-# Doğrulama kaydı · 2 Kasım 2026
+# Doğrulama kaydı · 3 Kasım 2026
+
+## 0.8 · Kişisel çalışma paketi
+
+104/104 test, uygulama/sunucu JavaScript sözdizimi kontrolü ve 41 tarayıcı dosyalı Worker derlemesi başarılı.
+
+Yeni testler kişisel alan/sınır/kimlik doğrulaması, revizyon ve geri alınabilir kaldırma, CSV BOM/alıntı/yeni satır/ayırıcı/hata atomikliği, formül korumalı dışa aktarma, eski verinin göçü, zorlanma geçmişi ve ayrı beceriler, eksik kaynaklar, dondurulmuş turlar, eski form gönderimleri ve dinleme renderer/gate/evidence entegrasyonunu kapsar. Dinleme sözlüğünün tüm hazır kelimelerinde iki modun cevap/çeldirici kimlikleri taranır; iptal/hata/eski callback/başka sürüm tamamlanma kanıtı sayılmaz.
+
+Gerçek uygulama içi tarayıcı, ayrı yerel 4183 adresi:
+
+- Genki 1 · Bölüm 1 destesi oluşturuldu. 学校 / がっこう / okul / school, etiket ve örnek eklendi. Anlam pratiğinde yazılan cevap, okunuş açılıp kapanırken korundu. Yanlış tren cevabı ve ipucu kullanımı kaydedildi; Zorlandıklarım bunu ayrı sütunlarda gösterdi. Aynı soruya kısa turda okul cevabı doğru kabul edildi; eski yanlış korunup ipucusuz doğru sayısı 1 oldu.
+- CSV önizlemesinde 本 geçerli, 水 için water okunuşu hatalıydı. 1 hata varken onay devre dışı ve kelime sayısı değişmeden kaldı. Okunuş みず olarak düzeltildikten sonra iki kelime açık onayla eklendi. Yenilemede deste ve üç kelime korundu.
+- Kişisel deste, Zorlandıklarım ve Dinleme sayfaları 390 piksel, 320 piksel büyük yazı ve İngilizce görünümde incelendi; yatay belge taşması yoktu. Kişisel kelimeler dinleme kaynağına 3 kelime olarak geldi. Normal test tarayıcısında Japonca ses yoktu; gerçek dinleme başlatma düğmesi açıklamayla devre dışı kaldı.
+
+Kontrollü ses/clock QA proxy’si, ayrı 4184 adresi (yalnız repo dışındaki work dosyası, yayınlanmaz):
+
+- Görünür “Simulated audio · QA only” etiketi altında sahte Japonca motoru başlama/bitiş callback’leri üretti; gerçek ses yoktu. Ses öncesinde Japonca kelime görünmedi ve cevap alanları kapalıydı; 1–4 kısayolu devre dışı seçenekleri işaretlemedi. Ses iptalinden sonra cevap kapısı kapalı kaldı.
+- Dikte sorusunda ses tamamlandıktan sonra yanlış cevap kaydedildi. Yalnız test saatini 11 dakika ilerleterek aynı soru normal tekrar kuyruğunda açıldı; yeniden dinlemeden cevap verilemedi. Tamamlanan ses sonrası doğru cevap kaydedildi. Zorlandıklarım turundaki aynı dinleme sorusunda da bağımsız scope kapısı çalıştı.
+- UI’dan indirilen JSON incelendi: tam 3 benzersiz olay, becerilerin tümü listening, modlar listening/review/weakness, tümünde audioPlaybackCompleted:true; sonuçlar yanlış/doğru/doğru. Başlatılan/iptal edilen ilk sesli tur cevap üretmedi. QA verisi, proxy, sahte motor ve saat kaydırma dosyaları kaynak deposuna alınmaz.
+
+Gerçek ses çıkışı/telaffuz, fiziksel telefon ve ekran okuyucu denenmedi. Yeni kişisel içeriğin doğruluğu kullanıcıya aittir; N5–N1 etiketleri kullanıcı etiketi/çalışma bandıdır. Bu sürüm bulut eşitlemesi veya yeni bildirim servisi eklemez. Önceki 14 piksel mobil okunuş düğmesi boşluğu bu kaynak commitine dahil edilir.
 
 ## 0.7.1 · Seçim tablolarında kaydırma
 

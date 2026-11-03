@@ -1,6 +1,19 @@
 # Yomu · Japonca çalışma alanı
 
-**0.7.1 · 2 Kasım 2026** — Seçim tablolarının kaydırma konumu korunur. Kelime seslendirmesi, N5–N1 çalışma alanları, okunuş ipuçları, kanji bilgileri ve hatırlatıcıyla birlikte çalışır.
+**0.8.0 · 3 Kasım 2026** — Zorlandıklarım, kişisel kelime desteleri ve dinleme quizleri eklendi. Önceki mobil okunuş düğmesinin boşluk düzeltmesi de bu sürüme dahil.
+
+## 0.8 · Sana ait çalışma alanları
+
+Üstteki **Zorlandıklarım / Destelerim / Dinleme** bağlantıları telefonda da görünür. Ana sayfada üç alanın başlangıç kartları vardır. Mevcut harf, kelime, cümle, gramer, anime ve tekrar alanları korunur.
+
+- **Zorlandıklarım:** Tüm cevap geçmişini öğe × beceri olarak toplar. Yanlış, cevap gösterimi, ipucu kullanımı ve ipucusuz doğruyu ayrı gösterir; ipucu sütunu diğerleriyle kesişebilir. Sonradan doğru cevap vermek önceki yanlışları silmez. İçerik, beceri, zorlanma türü ve geçmiş filtrelerinden 5 veya 10 soruya kadar bir tur başlatılır. Sorular başlangıç seçkisi/sürümüyle dondurulur; normal tekrar vadesini beklemek gerekmez. Bu sıralama bir ustalık veya JLPT tahmini değildir.
+- **Destelerim:** Deste oluştur/adını değiştir; kelime, kana okunuşu, Türkçe anlam, isteğe bağlı İngilizce anlam, etiket, örnek ve not ekle. Genki kitabının/bölümünün adını kendi etiketin olarak kullanabilirsin. Kelimeler kullanıcı içeriğidir; otomatik çevrilmez veya editör onaylı sayılmaz. Anlamını, okunuşunu ve Japonca yazımını ayrı çalışabilir; normal tekrar listesine kaydedebilirsin. Düzenleme eski cevapları değiştirmez. Kaldırılan kelimeler geri alınabilir; geçmiş cevapları silinmez.
+- **CSV:** Destelerim içinde örnek dosya indir veya bir CSV dosyası/metni seç. En fazla 1 MB / 1000 satır; gerekli sütunlar `written,reading,tr`, isteğe bağlı `en,deck,tags,notes,example,level`. Önce satırları ve hataları önizle, sonra eklemeyi onayla. Tek hatalı satır varsa hiçbir kelime eklenmez. Dosya yalnızca tarayıcıda okunur. Seçili kelimeler CSV olarak da dışa aktarılabilir; formül benzeri alanlar elektronik tablo için korunur. JSON dışa aktarma desteleri de içerir; JSON yedeğini geri yükleme henüz yoktur.
+- **Dinleme:** Hazır kelimeler veya kişisel destelerden anlam seçme/kana dikte turu oluştur. Japonca yazım cevap verilene kadar gizlidir. Sesi en az bir kez tamamlamadan cevap kaydedilmez. İptal, eksik oynatma veya hata yeni dinleme cevabı üretmez. Cevaptan sonra yazım, okunuş ve anlam açılır; cevap dinleme becerisi olarak ayrıca zamanlanır. Aynı ses kuralı normal tekrar ve Zorlandıklarım içindeki dinleme sorularında da uygulanır.
+
+Dinleme cihazın/tarayıcının Japonca sentetik sesine bağlıdır. Japonca ses yoksa dinleme turu başlatılamaz; başka dilde ses kullanılmaz. Yeni ücretli API/hesap veya ses kaydı hizmeti eklenmedi. Oynatıcının tamamlanma kaydı insanın duyduğunu kanıtlamaz. Yenilemeden sonra cevapsız dinleme sorusu için sesi yeniden dinlemek gerekir. Veriler hâlâ aynı cihaz + tarayıcı + adresin IndexedDB alanındadır; otomatik cihaz eşitlemesi eklenmedi.
+
+Otomatik testlere ek olarak kişisel kelime ekleme, CSV hatası/onayı, yanlış → Zorlandıklarım turu, mobil/dar ekran ve kontrollü ses motoruyla üç farklı dinleme cevap yolu denendi. Gerçek Japonca ses çıkışı ve fiziksel telefon testi yapılmadı. [Ayrıntılı QA](docs/qa.md).
 
 ## 0.7.1 · Seçerken bulunduğun yerde kal
 

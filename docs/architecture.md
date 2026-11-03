@@ -1,5 +1,17 @@
 # Mimari ve tekrar kararı · 30 Ekim 2026
 
+## 0.8 · Kişisel desteler, zorlanma geçmişi ve dinleme
+
+personal-data.js döngüsüz doğrulama/CSV/soru çözümleme/snapshot mantığını; personal-feature.js sayfa ve olay denetimlerini taşır. Kişisel sorular personal:<uuid>:<mode>, öğeler personal-<uuid> kimliğiyle kalır. Düzenlemelerde revision/soru içerik sürümü değişir; eski cevap olayları korunur, mevcut kişisel tekrarlar yeni içerik için yeniden vadesi gelmiş yapılır. Kelime kaldırma tombstone + beceri kartlarının suspension bilgisiyle geri alınabilir; uygulama çözülemeyen soruları tekrar kuyruğuna başlatmaz.
+
+weakness-data.js tüm geçmişi öğe×beceri olarak toplar ve en son zorlanma tarihine göre sıralar. Gösterilen/yanlış/ipuculu olaylar ayrı sayılır; çift sayılan ipucu sütunları açıkça açıklanır. Varsayılan tüm geçmiş; yalnız son cevap veya son 30 gün filtreleri ayrıca seçilebilir. 5–10 soruluk tur gerçek adaylardan snapshot üretir. Dinleme, enjekte edilen özel renderer/gate/evidence olmadan asla normal kelime sorusu gibi gösterilip kaydedilmez. Eski/detached form kimlikleri ve asenkron gate sonrası değişmiş oturumlar reddedilir.
+
+listening-data.js hazır ve kişisel açık kana okunuşlarından anlam/dikte soruları çözer. Beceri listening, soru kimliği listening:<source>:<wordId>:<mode>; öğe kimliği ilgili kelimeyle ortaktır, böylece okunuş/anlam/dinleme ayrı skillState olur. Kaynak sürümü soru sürümüne eklenir. Dikte kana varyantlarını kabul eder; kanji okunuşu tahmin edilmez. Yanlış çeldiriciler aynı okunuşlu kelimelerden seçilmez.
+
+listening-feature.js doğal queued → speaking → aynı anahtarlı idle callback dizisini gerektiren bellek içi kapıyı yönetir. key:null iptal ve error tamamlanma değildir. Kanıt scope + soru kimliği + sürüme bağlıdır; başka tur/sorunun eski callback’i kapıyı açmaz. Oynatma tek başına DB’ye cevap yazmaz. Bir dinleme cevabı kaydedilirken audioPlaybackCompleted/audioSource/audioSpeed metadata’sı eklenir; bu insanın gerçekten duyduğunu kanıtlamaz. Cevap öncesi Japonca yazım/okunuş HTML’de gösterilmez. Ortak tekrar ve Zorlandıklarım aynı renderer/kapıyı kullanır. Yenileme geçici kanıtı temizler, tekrar dinlemek gerekir.
+
+Şema 3 / IndexedDB sürümü 1 korunur; personal, weakness ve listening varsayılanları eklemeli birleştirilir. Feature form submit’leri native gezinmeyi engellemek için await öncesinde prefix’e göre yakalanır. Yeni özellikler üretilen Worker’a normal tarayıcı modülleri olarak gömülür. Kişisel kelimeler, CSV önizlemesi ve cevaplar sunucuya gönderilmez; ücretli ses/AI servisi kurulmadı. Mevcut cihaz sesi motorunun ağ davranışı ayrıca uygulama tarafından denetlenmez.
+
 ## 0.7.1 · Aynı sayfada görünümün korunması
 
 view-state.js, render öncesinde data-scroll-key ile işaretlenen panellerin iki eksendeki kaydırmasını, data-disclosure-key ile işaretlenen details durumunu, sayfa konumunu ve uygulama içindeki odak kimliğini yakalar. Yeniden çizimden sonra önce açıklık/odak, sonra paneller ve sayfa kaydırması anlık olarak geri yüklenir. Odak preventScroll ile ve kendi tablo kapsamı içinde eşleştirilir. Kaldırılan/devre dışı öğeler sessizce atlanır. Yeni rotaya geçişte eski sayfanın görünümü taşınmaz. Görünüm verisi IndexedDB’ye yazılmaz; cevaplar ve çalışma seçimi normal kalıcı kayıt akışında kalır. study-select artık ayrıntı başlığına scrollIntoView çağırmaz; kullanıcı liste içinde seçim yapmaya devam edebilir.
