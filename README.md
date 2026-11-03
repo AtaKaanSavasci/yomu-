@@ -1,10 +1,16 @@
 # Yomu · Japonca çalışma alanı
 
-**0.8.0 · 3 Kasım 2026** — Zorlandıklarım, kişisel kelime desteleri ve dinleme quizleri eklendi. Önceki mobil okunuş düğmesinin boşluk düzeltmesi de bu sürüme dahil.
+**0.8.1 · 3 Kasım 2026** — Kişisel çalışma paketi ve arayüz iyileştirmeleri. Önceki mobil okunuş düğmesinin boşluk düzeltmesi de bu sürüme dahil.
+
+## 0.8.1 · Daha rahat gezinme ve çalışma
+
+Telefon ve tablette **Bölümler → Tümü** menüsü bütün sayfaları açar; bulunduğun bölüm adı ve seçili bağlantı görünür. Mobil alt menü beş sık kullanılan alanı daha okunur etiketlerle gösterir. Masaüstündeki yinelenen üst bağlantılar kaldırıldı; tablet ikonlarına erişilebilir adlar ve açıklamalar eklendi. Düğme/form alanları büyütüldü, metin kontrastı artırıldı ve telefonun alt güvenli alanı için yer ayrıldı.
+
+Kişisel kelime formu gerekli alanlar ve isteğe bağlı ayrıntılar olarak bölümlendi. Uzun CSV/deste yönetimi açılır bölümlerde kalır. Zorlandıklarım filtreleri, çalışılabilir soru sayısı ve geçmişin ayrı sayaçları daha net görünür. Dinleme ayarları tur başlayınca kapanır; açıp düzenlenebilir, devam eden turun soruları aynı kalır.
 
 ## 0.8 · Sana ait çalışma alanları
 
-Üstteki **Zorlandıklarım / Destelerim / Dinleme** bağlantıları telefonda da görünür. Ana sayfada üç alanın başlangıç kartları vardır. Mevcut harf, kelime, cümle, gramer, anime ve tekrar alanları korunur.
+**Zorlandıklarım / Destelerim / Dinleme** alanlarına yan menüden, telefon/tablet Bölümler menüsünden veya ana sayfadaki başlangıç kartlarından ulaşılır. Bu üç alan arasında kısa geçiş bağlantıları da vardır. Mevcut harf, kelime, cümle, gramer, anime ve tekrar alanları korunur.
 
 - **Zorlandıklarım:** Tüm cevap geçmişini öğe × beceri olarak toplar. Yanlış, cevap gösterimi, ipucu kullanımı ve ipucusuz doğruyu ayrı gösterir; ipucu sütunu diğerleriyle kesişebilir. Sonradan doğru cevap vermek önceki yanlışları silmez. İçerik, beceri, zorlanma türü ve geçmiş filtrelerinden 5 veya 10 soruya kadar bir tur başlatılır. Sorular başlangıç seçkisi/sürümüyle dondurulur; normal tekrar vadesini beklemek gerekmez. Bu sıralama bir ustalık veya JLPT tahmini değildir.
 - **Destelerim:** Deste oluştur/adını değiştir; kelime, kana okunuşu, Türkçe anlam, isteğe bağlı İngilizce anlam, etiket, örnek ve not ekle. Genki kitabının/bölümünün adını kendi etiketin olarak kullanabilirsin. Kelimeler kullanıcı içeriğidir; otomatik çevrilmez veya editör onaylı sayılmaz. Anlamını, okunuşunu ve Japonca yazımını ayrı çalışabilir; normal tekrar listesine kaydedebilirsin. Düzenleme eski cevapları değiştirmez. Kaldırılan kelimeler geri alınabilir; geçmiş cevapları silinmez.

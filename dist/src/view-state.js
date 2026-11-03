@@ -2,7 +2,7 @@
 const named=(root,selector,attribute,key)=>[...root.querySelectorAll(selector)].find(node=>node.getAttribute(attribute)===key);
 function focusIdentity(root,node){
  if(!node||!root.contains(node))return null;
- const attributes=node.id?['id']:node.hasAttribute('aria-label')?['aria-label']:['data-kana-group','data-lab','data-study','data-study-kind','data-anime','data-setting','data-action','data-item','data-kind','data-level','data-script','data-quote','data-lang'];
+ const attributes=node.id?['id']:node.hasAttribute('aria-label')?['aria-label']:['data-kana-group','data-lab','data-study','data-study-kind','data-anime','data-setting','data-personal','data-weakness-filter','data-listening-setting','data-action','data-item','data-kind','data-level','data-script','data-quote','data-lang'];
  const values=attributes.filter(name=>node.hasAttribute(name)).map(name=>[name,node.getAttribute(name)]);
  if(!values.length)return null;
  return {tag:node.tagName.toLowerCase(),values,scope:node.closest('[data-scroll-key]')?.getAttribute('data-scroll-key')||null};

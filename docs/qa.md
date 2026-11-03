@@ -1,5 +1,15 @@
 # Doğrulama kaydı · 3 Kasım 2026
 
+## 0.8.1 · Arayüz iyileştirmeleri
+
+105/105 test, JavaScript sözdizimi kontrolü ve 42 tarayıcı dosyalı Worker derlemesi başarılı. Yeni davranış testi, kişisel deste/zorlanma/dinleme filtrelerinin kayıttan sonraki yeniden çizimde klavye odağını ve sayfa konumunu koruduğunu doğrular.
+
+Yerel 4183 arayüzünde masaüstü yan menüsü ve yinelenen üst bağlantıların kaldırılması, 390 piksel Türkçe gezinme, Bölümler menüsünden Dinleme’ye geçiş ve menünün kapanması incelendi. Alt menünün ilk CSS denemesinde üst boşluk yüzünden etiketlerin aşağı kaydığı görüldü; mobil üst padding sıfırlanıp etiketler görünür olarak yeniden doğrulandı.
+
+320 piksel büyük yazı + İngilizce görünümde kişisel kelime formu, CSV önizlemesi, Zorlandıklarım filtreleri/sayaçları ve Dinleme sayfası kontrol edildi. Belge genişliği 305 piksel, görünüm 320 pikseldi. Kişisel alanlar 20 piksel yazıyla ekran içinde kaldı; zorlanma sayaçları iki sütunda taşmadı. CSV tablosu kendi yatay kaydırma alanında kaldı, belgeyi genişletmedi. 山 / やま / dağ / mountain formu kaydedildi; isteğe bağlı alan açılırken taslak korundu. CSV metin açılır alanından tek satırlı önizleme üretildi; içe aktarma onaylanmadı.
+
+Kontrollü 4184 ses QA’sında yeni tur başlatılınca ayarlar kapalı, soru görünür, cevap alanı ses öncesinde devre dışıydı. Bu ek kontrol gerçek ses çıkışı doğrulaması değildir. Fiziksel telefon, ekran okuyucu ve gerçek çentikli ekran güvenli alanı denenmedi.
+
 ## 0.8 · Kişisel çalışma paketi
 
 104/104 test, uygulama/sunucu JavaScript sözdizimi kontrolü ve 41 tarayıcı dosyalı Worker derlemesi başarılı.

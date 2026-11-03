@@ -1,1 +1,88 @@
-.weakness-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:16px}.weakness-filters label{display:flex;flex-direction:column;gap:8px;font-size:.8rem;min-width:0}.weakness-filters select{width:100%;min-width:0;padding:11px 10px;border:1px solid var(--line);border-radius:8px;background:var(--white);color:var(--ink);font:inherit}.weakness-start{display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin:22px 0}.weakness-start p{margin:0}.weakness-list{display:grid;gap:14px;max-height:750px;overflow:auto;margin:18px 0;padding:1px 5px 1px 1px}.weakness-row{display:grid;grid-template-columns:minmax(180px,1fr) minmax(260px,1.2fr);gap:20px;border:1px solid var(--line);border-radius:14px;padding:22px;background:var(--white);min-width:0}.weakness-row h2{font-size:1.35rem;line-height:1.8;font-weight:500;overflow-wrap:anywhere;margin:0 0 8px}.weakness-row p{font-size:.76rem;line-height:1.7;margin:12px 0 0;overflow-wrap:anywhere}.weakness-counts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-content:start;margin:0}.weakness-counts dt{font-size:.65rem;color:var(--muted);line-height:1.6;overflow-wrap:anywhere}.weakness-counts dd{font-size:1.3rem;color:var(--green);margin:4px 0 0}.weakness-unavailable{color:#955f37}.weakness-session,.weakness-complete{margin:25px 0}.weakness-session>.section-top{align-items:center;gap:15px;flex-wrap:wrap}.weakness-session>.section-top h2{font-size:1rem}.weakness-question{margin-top:18px}@media(max-width:700px){.weakness-filters{grid-template-columns:1fr;padding:20px;gap:15px}.weakness-row{grid-template-columns:1fr;padding:20px;gap:16px}.weakness-list{max-height:650px}.weakness-counts{gap:12px}.weakness-counts dt{font-size:.65rem}.weakness-counts dd{font-size:1.1rem}.weakness-start{align-items:stretch;flex-direction:column}.weakness-start>.btn{width:100%}.weakness-row h2{font-size:1.2rem}}
+.weakness-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:18px 16px;padding:24px}
+.weakness-filter-heading{grid-column:1/-1;padding-bottom:4px}
+.weakness-filter-heading h2{font-size:1rem;margin:0 0 7px;color:var(--ink)}
+.weakness-filter-heading p{font-size:.78rem;line-height:1.7;color:var(--muted);margin:0;max-width:640px}
+.weakness-filter-field{display:flex;flex-direction:column;gap:8px;font-size:.78rem;min-width:0;color:var(--ink)}
+.weakness-filter-field>span{font-weight:600}
+.weakness-filters select{width:100%;min-width:0;min-height:46px;padding:11px 10px;border:1px solid #c8d3bd;border-radius:9px;background:var(--white);color:var(--ink);font:inherit;font-size:.86rem;line-height:1.5}
+.weakness-filters select:focus-visible{outline:2px solid #6d8a65;outline-offset:3px}
+.weakness-start{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:22px;padding:24px 26px;border:1px solid #d6e0cb;border-radius:15px;background:var(--mint);margin:24px 0 30px}
+.weakness-start-copy{min-width:0;flex:1}
+.weakness-start-copy>.eyebrow{font-size:.58rem;color:#687d5d;letter-spacing:.1em;margin:0 0 8px}
+.weakness-start-copy h2{font-size:1.18rem;font-weight:600;line-height:1.5;margin:0 0 13px;color:var(--ink);overflow-wrap:anywhere}
+.weakness-start>.btn{min-height:46px;flex-shrink:0}
+.weakness-availability{display:flex;gap:10px 20px;flex-wrap:wrap;font-size:.75rem;color:#65785d;line-height:1.6}
+.weakness-availability strong{font-size:1rem;font-weight:650;color:var(--green);margin-right:4px}
+.weakness-start-help{font-size:.76rem;line-height:1.7;color:var(--muted);margin:12px 0 0}
+.weakness-history-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:0 0 10px}
+.weakness-history-heading h2{font-size:1.08rem;font-weight:600;line-height:1.5;margin:0;color:var(--ink)}
+.weakness-history-heading>span{font-size:.72rem;padding:5px 9px;border:1px solid var(--line);border-radius:999px;color:#6b7b61;white-space:nowrap}
+.weakness-order-note,.weakness-count-note,.weakness-history-footnote{font-size:.75rem;line-height:1.75;color:var(--muted);margin:8px 0;overflow-wrap:anywhere}
+.weakness-count-note{padding:12px 15px;background:#eff2e8;border-radius:9px;margin:14px 0}
+.weakness-list{display:grid;gap:16px;max-height:750px;overflow:auto;margin:18px 0 12px;padding:1px 5px 1px 1px;scrollbar-gutter:stable}
+.weakness-list:focus-visible{outline:2px solid #8b9f7d;outline-offset:4px;border-radius:15px}
+.weakness-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,1fr);gap:24px;border:1px solid var(--line);border-radius:15px;padding:23px;background:var(--white);min-width:0;align-items:start}
+.weakness-row--unavailable{background:#f8f8f2;border-style:dashed}
+.weakness-item-copy{min-width:0}
+.weakness-item-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:15px}
+.weakness-item-meta .level-pill{font-size:.62rem;line-height:1.5}
+.weakness-availability-badge{font-size:.6rem;padding:5px 8px;border-radius:999px;background:#eeeadd;color:#7e714e;line-height:1.5}
+.weakness-row h2{font-size:1.65rem;line-height:1.7;font-weight:500;overflow-wrap:anywhere;margin:0 0 16px;color:var(--green)}
+.weakness-row--unavailable h2{font-size:1.13rem;line-height:1.7;color:#68755e}
+.weakness-latest{display:flex;align-items:flex-start;flex-direction:column;gap:8px;margin:0}
+.weakness-latest>span{font-size:.67rem;color:var(--muted);line-height:1.5}
+.weakness-result{display:inline-block;width:fit-content;max-width:100%;padding:7px 11px;border-radius:8px;font-size:.76rem;line-height:1.5;font-weight:600;overflow-wrap:anywhere;background:#eef1e6;color:#5d7150}
+.weakness-result--wrong{background:#f6ead9;color:#805c38}
+.weakness-result--revealed{background:#f0ebdf;color:#79694b}
+.weakness-result--assisted-correct{background:#edf0e3;color:#62724b}
+.weakness-result--independent-correct{background:#e6efdd;color:#3d653e}
+.weakness-latest>small{font-size:.68rem;line-height:1.6;color:var(--muted)}
+.weakness-unavailable{font-size:.74rem;line-height:1.75;color:#826c48;margin:13px 0 0;overflow-wrap:anywhere}
+.weakness-counts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-content:start;margin:0;min-width:0}
+.weakness-counts>div{padding:12px;border:1px solid #e4e9db;border-radius:9px;background:#f8f9f3;min-width:0}
+.weakness-counts dt{font-size:.7rem;color:#6b7c60;line-height:1.55;overflow-wrap:anywhere}
+.weakness-counts dd{font-size:1.35rem;line-height:1.25;color:var(--green);margin:7px 0 0;font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere}
+.weakness-counts .weakness-count-total{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:0 2px 12px;margin-bottom:1px;background:none;border:0;border-bottom:1px solid var(--line);border-radius:0}
+.weakness-count-total dt{font-size:.76rem;color:var(--ink)}
+.weakness-count-total dd{font-size:1.65rem;margin:0}
+.weakness-counts .weakness-count-independent{background:#edf3e5;border-color:#d6e2ca}
+.weakness-history-footnote{font-size:.7rem;margin-top:13px}
+.weakness-empty{text-align:center;padding:32px 26px;margin-top:25px}
+.weakness-empty-mark{width:52px;height:52px;display:grid;place-items:center;margin:0 auto 18px;font-size:1.8rem;color:#668058;background:#eaf0df;border-radius:50%}
+.weakness-empty h2{font-size:1.18rem;line-height:1.5;margin:0 0 14px}
+.weakness-empty>p{max-width:600px;margin:0 auto 20px;font-size:.81rem;line-height:1.85}
+.weakness-empty .button-row{justify-content:center;gap:14px 22px;margin:21px 0}
+.weakness-empty .subtle-link{font-size:.78rem;min-height:44px;display:inline-flex;align-items:center}
+.weakness-empty>.weakness-empty-help{border-top:1px solid var(--line);padding-top:18px;margin:20px auto 0;font-size:.73rem;color:var(--muted)}
+.weakness-session,.weakness-complete{margin:25px 0}
+.weakness-session>.section-top{align-items:center;gap:15px;flex-wrap:wrap}
+.weakness-session>.section-top h2{font-size:1rem}
+.weakness-question{margin-top:18px}
+@media(max-width:700px){
+ .weakness-filters{grid-template-columns:1fr;padding:20px;gap:17px}
+ .weakness-filters select{font-size:16px;min-height:48px;padding:11px 8px}
+ .weakness-filter-heading p{font-size:.78rem}
+ .weakness-start{align-items:stretch;flex-direction:column;padding:22px 20px;gap:19px;margin:22px 0 27px}
+ .weakness-start-copy h2{font-size:1.12rem}
+ .weakness-start>.btn{width:100%}
+ .weakness-availability{gap:8px 15px;font-size:.74rem}
+ .weakness-row{grid-template-columns:1fr;padding:21px 18px;gap:21px}
+ .weakness-row h2{font-size:1.65rem;margin-bottom:15px}
+ .weakness-row--unavailable h2{font-size:1.12rem}
+ .weakness-list{max-height:730px;gap:14px}
+ .weakness-counts{gap:9px}
+ .weakness-counts>div{padding:12px 11px}
+ .weakness-counts dt{font-size:.73rem}
+ .weakness-counts dd{font-size:1.3rem}
+ .weakness-count-total dt{font-size:.76rem}
+ .weakness-count-total dd{font-size:1.6rem}
+ .weakness-result{font-size:.8rem}
+ .weakness-history-heading h2{font-size:1rem}
+ .weakness-order-note,.weakness-count-note{font-size:.74rem}
+ .weakness-count-note{padding:12px 13px}
+ .weakness-empty{padding:28px 20px}
+ .weakness-empty h2{font-size:1.1rem}
+ .weakness-empty .button-row{align-items:stretch;flex-direction:column;gap:10px}
+ .weakness-empty .button-row>.btn{width:100%}
+ .weakness-empty .subtle-link{justify-content:center}
+}

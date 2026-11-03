@@ -40,3 +40,12 @@ test('removed rows and tables do not throw or steal focus outside the applicatio
  const empty=new Node('div');assert.doesNotThrow(()=>restoreView(empty,saved,screen));assert.equal(screen.scrollY,120);
  const selected=captureView(fixture().root,viewport());assert.doesNotThrow(()=>restoreView(empty,selected,screen));assert.doesNotThrow(()=>restoreView(empty,null,screen));
 });
+
+test('personal, difficulty and listening filters keep keyboard focus after a saved selection repaints the page',()=>{
+ for(const attribute of ['data-personal','data-weakness-filter','data-listening-setting']){
+  const make=()=>{const first=new Node('select',{[attribute]:'first'}),selected=new Node('select',{[attribute]:'second'});const root=new Node('div',{},[first,selected]);root.ownerDocument={activeElement:selected};return{root,first,selected};};
+  const before=make(),after=make(),screen=viewport(0,710);
+  restoreView(after.root,captureView(before.root,screen),screen);
+  assert.deepEqual(after.selected.focusOptions,{preventScroll:true});assert.equal(after.first.focusOptions,undefined);assert.equal(screen.scrollY,710);
+ }
+});
