@@ -1,6 +1,16 @@
 # Yomu · Japonca çalışma alanı
 
-**0.8.1 · 3 Kasım 2026** — Kişisel çalışma paketi ve arayüz iyileştirmeleri. Önceki mobil okunuş düğmesinin boşluk düzeltmesi de bu sürüme dahil.
+**0.9.0 · 5 Kasım 2026** — Cihazlar arası eşitleme, JSON yedeğini geri yükleme, Genki çalışma yolu, replikten desteye kelime ve N5–N1 süreli denemeler.
+
+## 0.9 · Kitabın, destelerin ve cihazların birlikte
+
+- **Eşitleme:** Tercihler ve veriler → Eşitlemeyi kur. Yayımlanan sitede aynı ChatGPT hesabıyla giriş yapıp her cihazda önizlemeyi onayla. Cevaplar, kişisel desteler, tekrar kartları, tercihler, kişisel replikler, Genki tamamlama işaretleri ve deneme geçmişi hesaba bağlı D1 kaydında birleştirilir. İnternetsiz değişiklikler yerelde bekler; uygulama açıkken yeniden denenir. Aktif turlar, bildirim/takvim ayarları ve ekran seçimleri aktarılmaz. Yazarken veya aktif bir turdayken gelen değişiklikler ertelenir. Aynı alan düzenlendiyse cihaz/bulut tercihi istenir; birleştirmede eksik kayıt silme sayılmaz. Aynı kelime bağımsız eklenmişse tercih edilmeyen kopya kaldırılanlara alınır, geçmişi korunur. Bulut snapshot sınırı 1,8 MB; aşılırsa yerel veriler korunur ve JSON yedeği alınabilir.
+- **Yedekten geri yükleme:** Eski Yomu JSON dışa aktarımları da desteklenir (en fazla 8 MB). Dosya/alan doğrulaması → kayıt sayıları → birleştir veya bu cihazı değiştir → açık onay. Uygulama öncesinde bu cihazda kurtarma kopyası saklanır ve indirilebilir. Aktif turlar sıfırlanır; eşitleme bu cihazda duraklatılır. Hatalı, gelecekteki şemaya ait veya güvenli olmayan içerik kısmen uygulanmaz.
+- **Genki yolu:** GENKI I ders 1–12 ve GENKI II ders 13–23 için 3. baskı sırasıyla hazırlanmış 23 özgün TR/EN rehber, kana örnekleri ve birer mini pratik. Kaldığın ders ve kişisel tamamlama işaretleri; ilgili Yomu içeriklerine ve kendi `genki-3-l01` … `genki-3-l23` etiketli destelerine geçiş vardır. Kitap metinleri, alıştırmaları, kelime listeleri ve cevap anahtarları kopyalanmaz. Başka baskılar eşleştirilmedi. [Kaynak ve kapsam](docs/sources-genki.md).
+- **Replikten kelime:** Anime sayfasındaki altı çizili, kaynakla desteklenen altı kelimeye dokun; okunuş/anlam/kısa bağlamı incele ve bir deste seçerek onayla. Replik, özgün kaynak bağlantısı ve sözlük bağlantısı tarihsel `sourceSnapshot` içinde saklanır. Sonraki kişisel düzenleme bu kaynak kopyasını değiştirmez. Kişisel repliklerde okunuş ve anlam kullanıcı tarafından girilir; otomatik kanji okunuşu veya kelime ayırma yoktur. Kaydetmek yeni cevap/başarı üretmez.
+- **Seviye denemeleri:** N5–N1 için 8 kelime, 6 gramer ve seviyenin özgün okuma metnine bağlı 6 anlama sorusu. Japonca cihaz sesi varsa isteğe bağlı 4 kelime dinleme sorusu eklenir. 10/20/30/45 dakika; yenileme süreyi yeniden başlatmaz. Serbest soru gezinmesi, kayıtlı cevaplar, bitişte bölüm bazlı doğru/yanlış/boş/yapılmadı ve açıklamalı inceleme vardır. Son 30 sonuç tutulur ve eşitlenebilir. Resmî JLPT soruları veya ölçeklenmiş geçme/yeterlik puanı kullanılmaz; normal SRS olayları değişmez. [Kapsam](docs/sources-exams.md).
+
+156/156 otomatik test, JavaScript kontrolü ve 55 tarayıcı varlıklı Worker derlemesi başarılı. Gerçek UI’da Genki/anime/deneme/yedek akışları; iki ayrı yerel origin ve aynı SQLite veritabanıyla çift yönlü eşitleme denendi. Yerel eşitleme QA’sı simüle edilmiş kullanıcı kimliğini açıkça işaretler; üretim girişinin veya fiziksel telefonun doğrulanması anlamına gelmez. [Doğrulama kaydı](docs/qa.md).
 
 ## 0.8.1 · Daha rahat gezinme ve çalışma
 
@@ -53,7 +63,7 @@ Kapalı uygulama için aynı bölüm Google Takvim’de günlük etkinlik tasla�
 
 Yayınlanan Sites adresi HTTPS üzerinden, bilgisayardan bağımsız çalışır. Site hesabın sahibine özeldir; telefonda aynı ChatGPT hesabıyla giriş gerekir. Çalışma alanını Safari veya Chrome’da açıp tarayıcının ana ekrana ekleme seçeneğiyle kısayol oluşturabilirsin. Manifest başlangıç adresi ve uygulama görünümünü tanımlar; çevrimdışı önbellek veya çevrimdışı çalışma garantisi yoktur.
 
-Çalışma kayıtları hâlâ cihazın o tarayıcısındaki IndexedDB’de tutulur. Bilgisayardaki yerel adres ile yeni HTTPS adresi ve telefon arasında otomatik ilerleme eşitlemesi yoktur. Siteye erişim girişi ilerleme eşitlemesi anlamına gelmez. Çeviri ve video için internet gerekir. Site adresi ve yayın durumu teslim mesajında verilir; source deposunun GitHub adresi çalışan uygulamanın adresi değildir.
+Çalışma kayıtları varsayılan olarak cihazın o tarayıcısındaki IndexedDB’de tutulur. 0.9 sürümünde aynı yayımlanmış Site hesabındaki cihazlar için isteğe bağlı eşitleme vardır; her cihazda önizleme/onayı bir kez tamamlamak gerekir. Yerel geliştirme adresindeki kayıtlar otomatik taşınmaz; JSON yedeğiyle aktarılabilir. Siteye giriş yapmak tek başına eşitlemeyi açmaz. Çeviri ve video için internet gerekir. Site adresi ve yayın durumu teslim mesajında verilir; source deposunun GitHub adresi çalışan uygulamanın adresi değildir.
 
 Canlı bulut sunucusundan MyMemory’ye yapılan ilk istekte günlük kota hatası görüldü; cihazdan yapılan isteğe sağlayıcı yanıt verdi. Bu yüzden yalnızca sunucu QUOTA/429 döndürürse tarayıcı aynı MyMemory /get hizmetine doğrudan bağlanır. Yeni sağlayıcı veya anahtar yoktur. Girdi doğrulaması, 500 UTF-8 bayt sınırı, İngilizce ara dil ve iptal denetimi korunur. Cihazın da kotası doluysa hata gösterilir; sınırsız çeviri garantisi yoktur. Bu davranış çeviri alanında gönderimden önce açıklanır.
 

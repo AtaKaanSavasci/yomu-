@@ -33,3 +33,5 @@ export async function saveState(state) {
     tx.onabort = () => reject(conflict ? new ConflictError('State changed in another tab') : tx.error || new Error('Save aborted'));
   });
 }
+export function readStoreMeta(key){return new Promise((resolve,reject)=>{const r=db.transaction('app').objectStore('app').get('meta:'+key);r.onsuccess=()=>resolve(r.result||null);r.onerror=()=>reject(r.error);});}
+export function writeStoreMeta(key,value){return new Promise((resolve,reject)=>{const tx=db.transaction('app','readwrite');tx.objectStore('app').put(structuredClone(value),'meta:'+key);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('Metadata save aborted'));});}

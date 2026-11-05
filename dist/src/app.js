@@ -4,6 +4,11 @@ import {createWeaknessFeature} from './weakness-feature.js';
 import {getListeningQuestion} from './listening-data.js';
 import {createListeningFeature} from './listening-feature.js';
 import {answerCard} from './practice-ui.js';
+import {createDataFeature} from './data-feature.js';
+import {createGenkiFeature} from './genki-feature.js';
+import {getGenkiQuestion} from './genki-data.js';
+import {createExamFeature} from './exam-feature.js';
+import {createAnimeDeckFeature,animeQuoteTokens} from './anime-decks.js';
 import {captureView,restoreView} from './view-state.js';
 import {pronunciationControls,pronunciationText,createJapaneseSpeech,syncPronunciationControls} from './word-speech.js';
 import {requestTranslation} from './translation-client.js';
@@ -25,19 +30,19 @@ import {getStudyQuestion,defaultLearning} from './study-data.js';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 let state, busy = false, storageError = '', selectedWord = 'cafe', questionStarted = performance.now(), speaking = false;
-let clipCleanup=null,renderedRoute=null,listeningFeature,personalFeature,weaknessFeature;
+let clipCleanup=null,renderedRoute=null,listeningFeature,personalFeature,weaknessFeature,dataFeature,genkiFeature,examFeature,animeDeckFeature;
 const translationDraft={source:'tr',target:'ja',text:'',result:'',error:'',busy:false,route:[]};
 let translationRequest=0,translationAbort;
 let pendingCharacterInput=null,processingCharacterInput=false;
 const composingCharacterInputs=new WeakSet();
 const T = (tr, en) => state?.settings.language === 'en' ? en : tr;
 const L = obj => obj[state.settings.language];
-const resolveQuestion=(id,source=state)=>getListeningQuestion(id,source)||getPersonalQuestion(id,source)||getAnimeQuestion(id,source?.anime.customQuotes)||getContentQuestion(id);
+const resolveQuestion=(id,source=state)=>getGenkiQuestion(id)||getListeningQuestion(id,source)||getPersonalQuestion(id,source)||getAnimeQuestion(id,source?.anime.customQuotes)||getContentQuestion(id);
 const getQuestion=id=>resolveQuestion(id);
 const availableDueStates=(source=state)=>dueStates(source).filter(item=>resolveQuestion(item.questionId,source));
 const ui=()=>({T,L,esc,icon,showQuestionReadings:!!state?.settings.questionReadings});
 const hideKanjiInfo=installKanjiInfo(ui);
-const speechPlayer=createJapaneseSpeech({onChange:snapshot=>{updateAudioStatus();listeningFeature?.onSpeechChange(snapshot);}});
+const speechPlayer=createJapaneseSpeech({onChange:snapshot=>{updateAudioStatus();listeningFeature?.onSpeechChange(snapshot);if(state)examFeature?.onSpeechChange(snapshot);}});
 const icon = (name, cls = '') => {
   const paths = {
     book: '<path d="M3 5c4-1 6 0 9 2 3-2 5-3 9-2v15c-4-1-6 0-9 2-3-2-5-3-9-2z"/><path d="M12 7v15"/>',
@@ -72,6 +77,7 @@ async function commit(next, repaint = true) {
   busy = true;
   try {
     state = await saveState(next);
+    dataFeature?.changed();
     storageError = '';
     if (repaint) render();
     return true;
@@ -94,19 +100,19 @@ function navigate(where) {
 function focusHeading() { $('#main h1')?.focus({ preventScroll: true }); window.scrollTo(0, 0); }
 function focusStudy(){const el=$('.study-session .answer-input')||$('.study-session input[type="radio"]')||$('#study-stage-title');el?.focus({preventScroll:true});$('.study-session')?.scrollIntoView({block:'start'});}
 function navLink(id, name, label, count = '') { return `<a class="nav-link ${route() === id ? 'active' : ''}" href="#${id}" aria-label="${esc(label+(count!==''?' · '+count:''))}" title="${esc(label)}" ${route() === id ? 'aria-current="page"' : ''}>${icon(name)}<span>${label}</span>${count !== '' ? `<span class="nav-count">${count}</span>` : ''}</a>`; }
-function trainingSession(source=state){const r=route();return r==='personal'?source.personal.session:r==='weakness'?source.weakness.session:r==='listening'?source.listening.session:r==='vocabulary'?source.learning.session:r==='characters'?source.practice.session:r==='review'||r.startsWith('lesson/')?source.session:null;}
+function trainingSession(source=state){const r=route();return r==='genki'?source.genki.session:r==='personal'?source.personal.session:r==='weakness'?source.weakness.session:r==='listening'?source.listening.session:r==='vocabulary'?source.learning.session:r==='characters'?source.practice.session:r==='review'||r.startsWith('lesson/')?source.session:null;}
 function reviewScope(session,q){return `review:${session.id||'legacy'}:${q.id}`;}
 function renderTrainingQuestion(q,event,options){return q.skill==='listening'?listeningFeature.renderExercise(q,event,options):answerCard(q,event,ui(),options);}
 function trainingNav(){
  const groups=[
-  [T('ÖĞREN VE KEŞFET','LEARN AND EXPLORE'),[['today',T('Bugün','Today')],['characters',T('Harfler','Characters')],['vocabulary',T('Kelimeler','Words')],['sentences',T('Cümleler','Sentences')],['grammar',T('Gramer','Grammar')],['anime',T('Anime replikleri','Anime lines')],['library',T('Okuma köşesi','Read')]]],
+  [T('ÖĞREN VE KEŞFET','LEARN AND EXPLORE'),[['today',T('Bugün','Today')],['characters',T('Harfler','Characters')],['vocabulary',T('Kelimeler','Words')],['sentences',T('Cümleler','Sentences')],['grammar',T('Gramer','Grammar')],['genki',T('Genki çalışma yolu','Genki study path')],['exams',T('Seviye denemeleri','Level practice tests')],['anime',T('Anime replikleri','Anime lines')],['library',T('Okuma köşesi','Read')]]],
   [T('KENDİ ÇALIŞMA ALANIN','YOUR STUDY SPACE'),[['review',T('Tekrarlarım','My reviews')],['weakness',T('Zorlandıklarım','My weak spots')],['personal',T('Destelerim','My decks')],['listening',T('Dinleme','Listening')],['progress',T('İlerlemem','Progress')],['settings',T('Tercihler ve veriler','Preferences & data')]]]
  ];
  const current=groups.flatMap(([,links])=>links).find(([id])=>id===route())?.[1]||T('Çalışma alanı','Study space');
  const link=([id,label])=>`<a href="#${id}" ${route()===id?'aria-current="page"':''}>${esc(label)}${route()===id?'<span aria-hidden="true">✓</span>':''}</a>`;
  return `<div class="workspace-navigation"><details class="section-menu" data-disclosure-key="section-menu"><summary><span><small>${T('BÖLÜMLER','SECTIONS')}</small><strong>${esc(current)}</strong></span><span class="section-menu-toggle">${T('Tümü','Browse all')} <span aria-hidden="true">⌄</span></span></summary><nav aria-label="${T('Tüm bölümler','All sections')}">${groups.map(([label,links])=>`<div><p>${label}</p>${links.map(link).join('')}</div>`).join('')}</nav></details>${['weakness','personal','listening'].includes(route())?`<nav class="training-nav" aria-label="${T('Kişisel çalışma alanları','Personal study areas')}" data-scroll-key="training-navigation">${groups[1][1].filter(([id])=>['weakness','personal','listening'].includes(id)).map(link).join('')}</nav>`:''}</div>`;
 }
-function trainingLaunches(){return `<section class="training-launches"><div class="section-top"><h2>${T('Kendi çalışma alanın','Your study space')}</h2></div><div class="training-launch-grid">${[['weakness','↻',T('Zorlandıklarım','My weak spots'),T('Yanlışlarını ve ipucuyla verdiğin cevapları yeniden çalış.','Revisit errors and answers that used a hint.')],['personal','語',T('Kişisel desteler','Personal decks'),T('Kendi kelimelerini, örneklerini ve Genki bölüm etiketlerini ekle.','Add your own words, examples and Genki chapter tags.')],['listening','♪',T('Dinleme quizleri','Listening quizzes'),T('Kelimeyi görmeden anlamını bul veya duyduğunu kana ile yaz.','Find the meaning without seeing the word, or write what you hear in kana.')]].map(([id,glyph,title,description])=>`<a class="training-launch" href="#${id}"><span aria-hidden="true">${glyph}</span><h3>${title}</h3><p>${description}</p>${icon('arrow')}</a>`).join('')}</div></section>`;}
+function trainingLaunches(){return `<section class="training-launches"><div class="section-top"><h2>${T('Kendi çalışma alanın','Your study space')}</h2></div><div class="training-launch-grid">${[['weakness','↻',T('Zorlandıklarım','My weak spots'),T('Yanlışlarını ve ipucuyla verdiğin cevapları yeniden çalış.','Revisit errors and answers that used a hint.')],['personal','語',T('Kişisel desteler','Personal decks'),T('Kendi kelimelerini, örneklerini ve Genki bölüm etiketlerini ekle.','Add your own words, examples and Genki chapter tags.')],['genki','学',T('Genki çalışma yolu','Genki study path'),T('Genki 1 ve 2 için bölüm bölüm özgün pratik.','Original practice organised by Genki 1 and 2 lessons.')],['exams','時',T('Seviye denemeleri','Level practice tests'),T('Süreli kelime, gramer, okuma ve dinleme turları.','Timed vocabulary, grammar, reading and listening practice.')],['listening','♪',T('Dinleme quizleri','Listening quizzes'),T('Kelimeyi görmeden anlamını bul veya duyduğunu kana ile yaz.','Find the meaning without seeing the word, or write what you hear in kana.')]].map(([id,glyph,title,description])=>`<a class="training-launch" href="#${id}"><span aria-hidden="true">${glyph}</span><h3>${title}</h3><p>${description}</p>${icon('arrow')}</a>`).join('')}</div></section>`;}
 function render() {
   const currentRoute=route(),view=currentRoute===renderedRoute?captureView($('#app')):null;
   stopAudio();
@@ -120,10 +126,10 @@ function render() {
   $('#app').innerHTML = `<div class="shell"><aside class="sidebar" data-scroll-key="navigation"><a href="#today" class="brand" aria-label="Yomu">${icon('book')}<span>yomu<span class="brand-jp" lang="ja">読む</span></span></a>
     <div class="space-label">${T('JAPONCA ÇALIŞMA ALANIN', 'YOUR JAPANESE STUDY SPACE')}</div>
     <nav aria-label="${T('Ana menü', 'Main navigation')}">
-      ${navLink('today', 'home', T('Bugün', 'Today'))}${navLink('characters','book',T('Harfler','Characters'))}${navLink('vocabulary','leaf',T('Kelimeler','Words'))}${navLink('sentences','book',T('Cümleler','Sentences'))}${navLink('grammar','book',T('Gramer','Grammar'))}${navLink('anime','sound',T('Anime replikleri','Anime lines'))}${navLink('library', 'leaf', T('Okuma köşesi', 'Read'))}${navLink('review', 'repeat', T('Tekrarlarım', 'Reviews'), due)}${navLink('weakness','repeat',T('Zorlandıklarım','My weak spots'))}${navLink('personal','book',T('Destelerim','My decks'))}${navLink('listening','sound',T('Dinleme','Listening'))}${navLink('progress', 'chart', T('İlerlemem', 'Progress'))}
-    </nav><div class="sidebar-bottom"><div class="quiet-note"><span lang="ja">一歩ずつ。</span><p>${T('Her gün, küçük bir adım.', 'A small step, every day.')}</p></div>${navLink('settings', 'settings', T('Tercihler ve veriler', 'Preferences & data'))}<div class="local-label"><i></i>${T('Bu tarayıcıya kaydedilir', 'Saved in this browser')}</div></div>
+      ${navLink('today', 'home', T('Bugün', 'Today'))}${navLink('characters','book',T('Harfler','Characters'))}${navLink('vocabulary','leaf',T('Kelimeler','Words'))}${navLink('sentences','book',T('Cümleler','Sentences'))}${navLink('grammar','book',T('Gramer','Grammar'))}${navLink('anime','sound',T('Anime replikleri','Anime lines'))}${navLink('library', 'leaf', T('Okuma köşesi', 'Read'))}${navLink('review', 'repeat', T('Tekrarlarım', 'Reviews'), due)}${navLink('weakness','repeat',T('Zorlandıklarım','My weak spots'))}${navLink('personal','book',T('Destelerim','My decks'))}${navLink('listening','sound',T('Dinleme','Listening'))}${navLink('genki','book',T('Genki yolu','Genki path'))}${navLink('exams','clock',T('Seviye denemeleri','Practice tests'))}${navLink('progress', 'chart', T('İlerlemem', 'Progress'))}
+    </nav><div class="sidebar-bottom"><div class="quiet-note"><span lang="ja">一歩ずつ。</span><p>${T('Her gün, küçük bir adım.', 'A small step, every day.')}</p></div>${navLink('settings', 'settings', T('Tercihler ve veriler', 'Preferences & data'))}<div class="local-label"><i></i>${T('Yerel kayıt · İsteğe bağlı eşitleme', 'Local records · Optional cloud sync')}</div></div>
   </aside><div class="workspace"><header class="topbar"><span class="top-caption">${T('Kendine biraz Japonca zamanı ayır.', 'Make a little time for Japanese.')}</span><div class="top-controls"><button class="text-size" data-action="large" aria-pressed="${state.settings.largeText}" aria-label="${T('Büyük yazı', 'Large text')}">A<span>A</span></button><div class="language-switch" aria-label="${T('Arayüz dili', 'Interface language')}"><button data-lang="tr" aria-pressed="${state.settings.language === 'tr'}">TR</button><button data-lang="en" aria-pressed="${state.settings.language === 'en'}">EN</button></div><span class="avatar" aria-hidden="true">読</span></div></header>
-    <main id="main" tabindex="-1"><div id="storage-error" class="error-banner" role="alert" hidden></div><div class="date-line"><span>${esc(date)}</span><span class="prototype-tag">${T('JAPONCA ÇALIŞMA ALANI', 'JAPANESE STUDY SPACE')} · 0.8.1</span></div>${trainingNav()}${page()}</main>
+    <main id="main" tabindex="-1"><div id="storage-error" class="error-banner" role="alert" hidden></div><div class="date-line"><span>${esc(date)}</span><span class="prototype-tag">${T('JAPONCA ÇALIŞMA ALANI', 'JAPANESE STUDY SPACE')} · 0.9.0</span></div>${trainingNav()}${page()}</main>
     <footer><span>yomu · ${T('Küçük metinler, yeni dünyalar.', 'Small texts, new worlds.')}</span><span>${T('Çalışma notları · İnsan editörü onayı bekliyor', 'Study notes · Awaiting human editorial review')}</span></footer></div></div>`;
   $('.top-controls').insertAdjacentHTML('afterbegin', `<button class="translator-trigger" data-action="open-translation" aria-label="${T('Çeviri masasını aç','Open translation desk')}"><span>文</span><span>${T('Çevir','Translate')}</span></button><a class="mobile-settings" href="#settings" aria-label="${T('Tercihler ve veriler', 'Preferences & data')}">${icon('settings')}</a>`);
   if (storageError) showStorageError();
@@ -136,8 +142,10 @@ function page() {
   if(r==='personal')return personalFeature.page();
   if(r==='weakness')return weaknessFeature.page();
   if(r==='listening')return listeningFeature.page();
+  if(r==='genki')return genkiFeature.page();
+  if(r==='exams')return examFeature.page();
   if(r==='characters')return charactersPage(state,ui());
-  if(r==='anime')return animePage(state,ui());
+  if(r==='anime')return animePage(state,ui(),{quoteTokens:animeQuoteTokens,panel:animeDeckFeature.panel});
   if(['vocabulary','sentences','grammar'].includes(r))return studyPage(state,r,ui());
   if(r==='translate')return `${heading(T('ÇEVİRİ MASASI','TRANSLATION DESK'),T('Üç dil, altı yön.','Three languages. Six directions.'),T('Türkçe ↔ Japonca ↔ İngilizce.','Turkish ↔ Japanese ↔ English.'))}${translationBox(translationDraft,ui(),'full')}`;
   if (r === 'library') return libraryPage();
@@ -230,7 +238,7 @@ function settingsFields() {
   return `<div class="form-grid"><label>${T('Hedefim', 'My goal')}<select name="goal"><option value="reading" ${state.settings.goal === 'reading' ? 'selected' : ''}>${T('Kısa metinlere geçmek', 'Move on to short texts')}</option><option value="everyday" ${state.settings.goal === 'everyday' ? 'selected' : ''}>${T('Günlük ifadeleri pekiştirmek', 'Practice everyday expressions')}</option></select></label><label>${T('Başlangıç noktam', 'My starting point')}<select name="level"><option value="kana" ${state.settings.level === 'kana' ? 'selected' : ''}>${T('Kana okuyabiliyorum', 'I can read kana')}</option><option value="basic" ${state.settings.level === 'basic' ? 'selected' : ''}>${T('Temel cümlelere aşinayım', 'I know basic sentences')}</option></select></label><label>${T('Günlük niyetim', 'My daily intention')}<select name="dailyMinutes">${[5,10,15].map(n => `<option value="${n}" ${state.settings.dailyMinutes === n ? 'selected' : ''}>${n} ${T('dakika', 'minutes')}</option>`).join('')}</select></label><label>${T('Gün sınırı için saat dilimi', 'Time zone for day boundaries')}<input name="timezone" value="${esc(state.settings.timezone)}" required placeholder="Europe/Istanbul" maxlength="100"><span class="small muted">${T('Gün 00.00’da başlar. IANA adı kullan: Europe/Istanbul gibi.', 'The day starts at 00:00. Use an IANA name, e.g. Europe/Istanbul.')}</span></label></div><p class="small muted">${T('Hedef ve seviye tercihi kaydedilir; bu küçük paketin içeriği değişmez. Günlük süre, cevap önerisini ayarlar.', 'Goal and level are saved; this small content pack stays the same. Daily time adjusts the suggested answer count.')}</p>`;
 }
 function settingsPage() {
-  return `${heading(T('TERCİHLER VE VERİLER', 'PREFERENCES & DATA'), T('Kendi ritmini bul.', 'Find your own rhythm.'), T('İlerleme bu tarayıcıda saklanır. Çeviri ve videolar dış hizmetlerden gelir. Hesap/eşitleme yok.', 'Progress stays in this browser. Translation and videos use external services. No account or sync.'))}<section class="panel"><form id="settings-form">${settingsFields()}<p id="settings-validation" role="alert" class="validation"></p><button class="btn primary" type="submit">${T('Tercihlerimi kaydet', 'Save preferences')}${icon('check')}</button></form></section><section class="panel"><h2>${T('Kayıtların yanında kalsın.', 'Keep your records with you.')}</h2><p>${T('Cevapların, kişisel destelerin, tekrar planın ve tercihlerin JSON olarak dışa aktarılır. JSON yedeğini geri yükleme henüz yok; Destelerim alanında CSV kelime içe aktarma vardır.', 'Export answers, personal decks, review schedule and preferences as JSON. JSON backup restoration is not available yet; My decks supports CSV word import.')}</p>${button(`${icon('download')}${T('Verilerimi dışa aktar', 'Export my data')}`, 'export', 'secondary')}<p class="small muted">${T('Tarayıcı verilerini silmek kayıtları kaldırır. Özel pencere kalıcı kayıt sağlamayabilir. Düzenli dışa aktarım önerilir.', 'Clearing browser data removes records. Private browsing may not retain them. Export regularly.')}</p></section><section class="panel"><h2>${T('Sorun bildirimlerin', 'Your issue reports')}</h2><p class="muted">${T('Yalnızca burada saklanır; bir ekibe gönderilmez. Dışa aktarılan dosyada yer alır.', 'Stored here only; not sent to a team. Included in your data export.')}</p>${state.issues.length ? `<ul class="issue-list">${state.issues.map(i => `<li><strong>${esc(i.questionId)}</strong> · ${formatDate(i.createdAt)}<p>${esc(i.description)}</p></li>`).join('')}</ul>` : `<p class="small muted">${T('Henüz bildirim yok.', 'No reports yet.')}</p>`}</section><section class="info-note"><p>${T('Paket: Hiragana/katakana için 104’er kana, 50 kanji kelimesi, 4 anime örneği ve kişisel replikler; ayrıca 3 kısa okuma, 9 soru. Çeviri MyMemory üzerinden; videolar yayıncıların YouTube oynatıcısından gelir. Eğitmen onayı ve ücretli paket yok.', 'Pack: 104 kana per script, 50 kanji words, 4 anime examples and personal lines; plus 3 short readings and 9 questions. Translation uses MyMemory; videos use publishers’ YouTube players. No teacher approval or paid tiers.')}<br><span class="small">${T('İçerik sürümü', 'Content version')}: ${CONTENT_VERSION} · ${T('Araştırma', 'Research')}: 30.10.2026.</span></p></section>`;
+  return `${heading(T('TERCİHLER VE VERİLER', 'PREFERENCES & DATA'), T('Kendi ritmini bul.', 'Find your own rhythm.'), T('Kayıtlarını cihazında tut, JSON yedeğini geri yükle veya aynı hesabındaki cihazlarla eşitle.', 'Keep local records, restore a JSON backup or sync devices signed in to the same account.'))}<section class="panel"><form id="settings-form">${settingsFields()}<p id="settings-validation" role="alert" class="validation"></p><button class="btn primary" type="submit">${T('Tercihlerimi kaydet', 'Save preferences')}${icon('check')}</button></form></section>${dataFeature.page()}<section class="panel"><h2>${T('Sorun bildirimlerin', 'Your issue reports')}</h2><p class="muted">${T('Notların bu cihazda tutulur ve eşitlemeyi açarsan hesabının bulut kaydına eklenir. Bir ekibe gönderilmez.', 'Notes stay on this device and join your account’s cloud record if you enable sync. They are not sent to a team.')}</p>${state.issues.length ? `<ul class="issue-list">${state.issues.map(i => `<li><strong>${esc(i.questionId)}</strong> · ${formatDate(i.createdAt)}<p>${esc(i.description)}</p></li>`).join('')}</ul>` : `<p class="small muted">${T('Henüz bildirim yok.', 'No reports yet.')}</p>`}</section><section class="info-note"><p>${T('Paket: Hiragana/katakana için 104’er kana, 50 kanji kelimesi, 4 anime örneği ve kişisel replikler; ayrıca 3 kısa okuma, 9 soru. Çeviri MyMemory üzerinden; videolar yayıncıların YouTube oynatıcısından gelir. Eğitmen onayı ve ücretli paket yok.', 'Pack: 104 kana per script, 50 kanji words, 4 anime examples and personal lines; plus 3 short readings and 9 questions. Translation uses MyMemory; videos use publishers’ YouTube players. No teacher approval or paid tiers.')}<br><span class="small">${T('İçerik sürümü', 'Content version')}: ${CONTENT_VERSION} · ${T('Araştırma', 'Research')}: 30.10.2026.</span></p></section>`;
 }
 function openDialog(html) { $('#dialog').innerHTML = html; $('#dialog').showModal(); }
 function setupDialog() { openDialog(`<div class="dialog-heading"><p class="eyebrow">${T('KÜÇÜK BİR BAŞLANGIÇ', 'A LITTLE BEGINNING')}</p><button class="close-dialog" data-action="close-dialog" aria-label="${T('Kapat', 'Close')}">×</button></div><h2>${T('Sana uygun bir ritim.', 'A rhythm that suits you.')}</h2><p class="muted">${T('Bir dakikada ayarla. İstediğin zaman değiştirebilirsin.', 'Set it up in a minute. Change it whenever you like.')}</p><form id="setup-form">${settingsFields()}<p id="settings-validation" role="alert" class="validation"></p><button type="submit" class="btn primary full-width">${T('Bu ritimle başlayalım', 'Let’s start at this pace')}${icon('arrow')}</button></form><button class="subtle-link dialog-skip" data-action="close-dialog">${T('Şimdilik doğrudan örnek dersi keşfet', 'Explore a sample lesson for now')}</button>`); }
@@ -238,6 +246,7 @@ function reportDialog(id) { openDialog(`<div class="dialog-heading"><p class="ey
 function voices() { return speechPlayer.voices(); }
 function updateAudioStatus() {
   listeningFeature?.sync();
+  if(state)examFeature?.sync();
   const playback=speechPlayer.snapshot();speaking=['queued','speaking'].includes(playback.phase);
   syncPronunciationControls(document,ui(),speechPlayer);
   const btn = $('[data-action="audio"]');
@@ -362,13 +371,17 @@ document.addEventListener('click', async e => {
     if (target.dataset.lang !== state.settings.language) { const next = structuredClone(state); next.settings.language = target.dataset.lang; if (await commit(next)) $('[data-lang="' + state.settings.language + '"]')?.focus(); }
     return;
   }
-  if (target.dataset.lesson) { await startLesson(target.dataset.lesson); return; }
+  if (target.dataset.lesson&&!target.dataset.action) { await startLesson(target.dataset.lesson); return; }
   if (target.dataset.word) { selectedWord = target.dataset.word; render(); $('[data-word="' + selectedWord + '"]')?.focus({ preventScroll: true }); return; }
   const action = target.dataset.action;
   if (!action) return;
   if(action.startsWith('personal-')){e.preventDefault();await personalFeature.click(target);return;}
   if(action.startsWith('weakness-')){e.preventDefault();await weaknessFeature.click(target);return;}
   if(action.startsWith('listening-')){e.preventDefault();await listeningFeature.click(target);return;}
+  if(action.startsWith('data-')){e.preventDefault();await dataFeature.click(target);return;}
+  if(action.startsWith('genki-')){e.preventDefault();await genkiFeature.click(target);return;}
+  if(action.startsWith('exam-')){e.preventDefault();await examFeature.click(target);return;}
+  if(action.startsWith('anime-deck-')){e.preventDefault();await animeDeckFeature.click(target);return;}
   if (target.tagName === 'A') e.preventDefault();
   if (action === 'reload') { location.reload(); return; }
   if (action === 'close-dialog') { $('#dialog').close(); return; }
@@ -443,6 +456,10 @@ document.addEventListener('click', async e => {
   if (action === 'toggle-suspend') { const item = next.skillStates[target.dataset.key]; item.suspended = !item.suspended; await commit(next); }
 });
 document.addEventListener('change', async e => {
+  if(await dataFeature.change(e.target))return;
+  if(route()==='genki'&&await genkiFeature.change(e.target))return;
+  if(route()==='exams'&&await examFeature.change(e.target))return;
+  if(route()==='anime'&&await animeDeckFeature.change(e.target))return;
   if(route()==='personal'&&await personalFeature.change(e.target))return;
   if(route()==='weakness'&&await weaknessFeature.change(e.target))return;
   if(await listeningFeature.change(e.target))return;
@@ -474,6 +491,9 @@ document.addEventListener('submit', async e => {
   if(featureForm.startsWith('personal-')){e.preventDefault();await personalFeature.submit(form);return;}
   if(featureForm.startsWith('weakness-')){e.preventDefault();await weaknessFeature.submit(form);return;}
   if(featureForm.startsWith('listening-')){e.preventDefault();await listeningFeature.submit(form);return;}
+  if(featureForm.startsWith('genki-')){e.preventDefault();await genkiFeature.submit(form);return;}
+  if(featureForm.startsWith('exam-')){e.preventDefault();await examFeature.submit(form);return;}
+  if(featureForm.startsWith('anime-deck-')){e.preventDefault();await animeDeckFeature.submit(form);return;}
   if(form.dataset.form==='reminder-settings'){
    e.preventDefault();if(busy)return;const data=new FormData(form),time=String(data.get('time')||'');if(!validReminderTime(time))return;const next=structuredClone(state);Object.assign(next.reminder,{time,enabled:data.get('enabled')==='on',lastFired:next.reminder.time===time?next.reminder.lastFired:null});if(await commit(next))toast(T('Saat kaydedildi. Kapalıyken alarm için takvim seçeneğini kullan.','Time saved. Use the calendar option for reminders when closed.'));return;
   }
@@ -539,7 +559,15 @@ const featureContext={getState:()=>state,commit,render,ui,toast,isBusy:()=>busy,
 listeningFeature=createListeningFeature({...featureContext,player:speechPlayer});
 personalFeature=createPersonalFeature(featureContext);
 weaknessFeature=createWeaknessFeature({...featureContext,getQuestion,renderExercise:renderTrainingQuestion,canAnswer:(q,key)=>listeningFeature.canAnswer(q,key),answerEvidence:(q,key)=>listeningFeature.answerEvidence(q,key)});
-try { state = await openStore(); render(); void checkStudyReminder(); }
+genkiFeature=createGenkiFeature({...featureContext,navigate});
+examFeature=createExamFeature({...featureContext,player:speechPlayer});
+animeDeckFeature=createAnimeDeckFeature(featureContext);
+dataFeature=createDataFeature({...featureContext,canApply:()=>!busy&&!(route()==='exams'&&state.exams.session?.phase==='active')&&!trainingSession()?.phase?.match(/exercise/)&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)});
+setInterval(()=>{if(state&&!document.hidden){void examFeature.tick();void dataFeature.syncNow();}},30000);
+setInterval(()=>{if(state)void examFeature.tick();},1000);
+window.addEventListener('online',()=>void dataFeature.syncNow());
+document.addEventListener('visibilitychange',()=>{if(state&&!document.hidden){void examFeature.tick();void dataFeature.syncNow();}});
+try { state = await openStore(); render(); void checkStudyReminder();void dataFeature.init(); }
 catch {
   state = freshState();
   $('#app').innerHTML = `<main class="fatal"><h1>${T('Yerel kayıt alanı açılamadı.', 'Local storage could not be opened.')}</h1><p>${T('Bu prototip cevaplarını güvenle kaydedebilmek için IndexedDB gerektirir. Tarayıcı ayarlarını kontrol edip sayfayı yenile.', 'This prototype needs IndexedDB to save your answers. Check browser settings and reload.')}</p><button class="btn primary" data-action="reload">${T('Yenile', 'Reload')}</button></main>`;

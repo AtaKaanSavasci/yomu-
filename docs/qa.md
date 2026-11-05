@@ -1,4 +1,20 @@
-# Doğrulama kaydı · 3 Kasım 2026
+# Doğrulama kaydı · 5 Kasım 2026
+
+## 0.9 · Eşitleme, yedek, Genki, replik ve denemeler
+
+156/156 test, tüm uygulama/sunucu JavaScript sözdizimi kontrolü ve 55 tarayıcı dosyalı Worker derlemesi başarılı. Yeni testler 23 Genki rehberinin kaynak/ID/cevap ilişkisi ve stale form/hint davranışını; beş seviyenin dondurulmuş deneme soruları, süre/dil/boş/çifte teslim/dinleme kanıtı davranışını; replikten deste işlemi, kaynak metadata ve HTML güvenliğini; eski JSON, şema/boyut/alan doğrulaması, olay dedup/schedule, kelime çakışma/kaldırma/not düzenlemesi, asenkron stale dosya/restore/upload yarışlarını kapsar. Node’un gerçek SQLite motoruyla kullanıcı ayrımı, koşullu INSERT/UPDATE/409, kimlik/origin/yöntem/gövde sınırları doğrulandı.
+
+Gerçek uygulama içi tarayıcı, ayrı 4185 adresi:
+
+- Genki ders 1 mini sorusu は cevabını doğru kaydetti; tamamlandı işareti ayrı seçilip yenileme/geri yüklemede korundu. İlk entegrasyon denemesinde genel `data-lesson` handlerının Genki düğmesini okuma sayfasına yönlendirdiği bulundu; action taşıyan düğmeler bu handlerdan ayrılıp gerçek tur yeniden doğrulandı.
+- Vinland Saga’daki 敵 önizlemesinden てき / düşman / enemy ve kaynak bağlantılarıyla “Anime kelimelerim” destesi oluşturuldu. Kaydetme yeni cevap sayısı oluşturmadı. Mobilde önizleme açılınca panel başlığına odak/kaydırma eklendi.
+- N5 20 soruluk denemede 電車/tren ve okuma metninin pazar günü cevabı kaydedildi. Yenilemede cevaplar ve azalmış süre korundu; teslimde 2 doğru / 0 yanlış / 18 boş ve dinleme “yapılmadı” gösterildi. Genki olayı normal ilerlemede 1 cevap kaldı.
+- UI’dan JSON indirildi ve aynı dosya yeniden seçildi: 1 cevap / 1 deste / 1 kelime / 1 Genki bölümü / 1 deneme önizlendi, açık onayla birleştirilip kurtarma kopyası indirme düğmesi oluştu. Kişisel replik kaynak snapshotı ve deneme geçmişi dosya doğrulamasından geçti.
+- 390 piksel Türkçe; 320 piksel büyük yazı+İngilizce Genki, deneme sonucu, yedek ayarı ve anime önizlemesi kontrol edildi. Belge genişliği 375/305 piksel olup görünümü aşmadı. Konsolda hata/uyarı yoktu.
+
+Repo dışındaki `work/v09-cloud-qa-server.mjs`, gerçek üretilmiş Worker ve migrationları ortak bellek SQLite’a bağladı; 4186/4187 ayrı origin/IndexedDB ile iki cihaz veri alanı temsil edildi. Görünür “Local sync QA · simulated identity” bandı altında yalnız sunucu `qa-user` kimliği sağladı. İlk alanın 1 cevap/deste/kelime/Genki/deneme verisi açık onayla buluta, sonra boş ikinci alana geldi. İkinci alanda ders 2 işaretlendi; ilk alanda eşitleme sonrası 2/23 işaret görüldü. Yenilemede eşitleme açık kaldı ve “Şimdi eşitle” düğmesi korundu. Konsol temizdi. QA sunucuları/sekme/viewportlar kapatıldı; örnek kayıtlar ve QA kimliği Git/yayın paketine alınmaz.
+
+Fiziksel iki telefon, gerçek Japonca ses çıkışı, ekran okuyucu ve giriş yapılmış üretim eşitleme UI’ı bu kayıtla doğrulanmış sayılmaz. Üretim yayın ve veritabanı sonucu ayrıca teslimde belirtilir. Genki yalnız 3. baskı için seçilmiş özgün yardımcı içeriktir; denemeler resmî JLPT veya geçme tahmini değildir.
 
 ## 0.8.1 · Arayüz iyileştirmeleri
 

@@ -13,7 +13,10 @@ const core=await read('dist/src/translation-core.js');if(/^import\s/m.test(core)
 const source=await read('worker/index.js'),importLine="import {translate,TranslationError} from '../scripts/translation-core.mjs';",marker='/* YOMU_BUNDLED_ASSETS */{}';
 if(!source.includes(importLine)||!source.includes(marker))throw Error('Hosted entry point markers changed');
 const manifest=JSON.parse(await read('.openai/hosting.json'));if(!manifest.project_id||manifest.static)throw Error('Use the registered Worker hosting manifest');
-const output=source.replace(importLine,core.replace(/^export /gm,'')).replace(marker,()=>JSON.stringify(assets));
+const examSchema=await read('dist/src/exam-schema.js');
+const schema=(await read('dist/src/backup-schema.js')).replace("import {isExamSession} from './exam-schema.js';",()=>examSchema.replace(/^export /gm,'')),sync=await read('worker/sync.js');
+const syncModule=`const {syncRequest}=(()=>{const {validateBackup,SYNC_BYTES}=(()=>{${schema.replace(/^export /gm,'')}\nreturn {validateBackup,SYNC_BYTES};})();\n${sync.replace(/^import .*;\r?\n/,'').replace(/^export /gm,'')}\nreturn {syncRequest};})();`;
+const output=source.replace(importLine,core.replace(/^export /gm,'')).replace("import {syncRequest} from './sync.js';",()=>syncModule).replace(marker,()=>JSON.stringify(assets));
 await mkdir(resolve(root,'dist/server'),{recursive:true});await mkdir(resolve(root,'dist/.openai'),{recursive:true});
 await writeFile(resolve(root,'dist/server/index.js'),output);await writeFile(resolve(root,'dist/.openai/hosting.json'),JSON.stringify(manifest,null,2)+'\n');
 const built=await import(`data:text/javascript;base64,${Buffer.from(output).toString('base64')}`);

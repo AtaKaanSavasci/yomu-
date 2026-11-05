@@ -5,6 +5,8 @@ import {defaultReminder} from './reminders.js';
 import {defaultPersonal} from './personal-data.js';
 import {defaultWeakness} from './weakness-data.js';
 import {defaultListening} from './listening-data.js';
+import {defaultGenki} from './genki-data.js';
+import {defaultExams,normaliseExams} from './exam-data.js';
 export const SCHEMA_VERSION = 3;
 export const ALGORITHM_VERSION = 'fixed-interval-v1';
 export const SKILLS = ['meaning', 'reading', 'listening', 'writing'];
@@ -12,7 +14,7 @@ export function freshState() {
   return { schemaVersion: SCHEMA_VERSION, contentVersion: CONTENT_VERSION, revision: 0,
     settings: { language: 'tr', goal: 'reading', level: 'kana', dailyMinutes: 10, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, largeText: false, questionReadings:false, furigana: true, explanations: true, translation: false, onboarded: false },
     events: [], skillStates: {}, lessons: {}, issues: [], session: null,
-    personal:defaultPersonal(),weakness:defaultWeakness(),listening:defaultListening(),reminder:defaultReminder(), learning:defaultLearning(), practice: defaultPractice(), anime: {level:'all',series:'all',activeId:'vinland-enemies',practice:null,customQuotes:[]} };
+    genki:defaultGenki(),exams:defaultExams(),personal:defaultPersonal(),weakness:defaultWeakness(),listening:defaultListening(),reminder:defaultReminder(), learning:defaultLearning(), practice: defaultPractice(), anime: {level:'all',series:'all',activeId:'vinland-enemies',practice:null,customQuotes:[]} };
 }
 export function hydrateState(saved) {
   if (!saved) return freshState();
@@ -20,7 +22,7 @@ export function hydrateState(saved) {
   const defaults=freshState();
   const learning={...defaults.learning,...saved.learning};
   for(const kind of ['vocabulary','sentences','grammar'])learning[kind]={...defaults.learning[kind],...saved.learning?.[kind]};
-  return {...defaults,...saved,schemaVersion:SCHEMA_VERSION,settings:{...defaults.settings,...saved.settings},practice:{...defaults.practice,...saved.practice},anime:{...defaults.anime,...saved.anime},reminder:{...defaults.reminder,...saved.reminder},personal:{...defaults.personal,...saved.personal},weakness:{...defaults.weakness,...saved.weakness},listening:{...defaults.listening,...saved.listening},learning};
+  return {...defaults,...saved,schemaVersion:SCHEMA_VERSION,settings:{...defaults.settings,...saved.settings},practice:{...defaults.practice,...saved.practice},anime:{...defaults.anime,...saved.anime},reminder:{...defaults.reminder,...saved.reminder},genki:{...defaults.genki,...saved.genki},exams:normaliseExams(saved.exams),personal:{...defaults.personal,...saved.personal},weakness:{...defaults.weakness,...saved.weakness},listening:{...defaults.listening,...saved.listening},learning};
 }
 export function dayKey(date, timeZone) {
   const parts = new Intl.DateTimeFormat('en', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date(date));

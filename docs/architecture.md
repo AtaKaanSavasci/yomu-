@@ -1,5 +1,17 @@
 # Mimari ve tekrar kararı · 30 Ekim 2026
 
+## 0.9 · Kalıcı bulut kaydı ve kitap/deneme alanları
+
+Yerel state şema 3 / IndexedDB sürümü 1 korunur. Genki ve deneme varsayılanları eklenir; deneme snapshotları `exam-schema.js` ile doğrulanır. Genki mini cevapları standart olay modelini kullanır; seviye denemeleri kendi sonuç geçmişini tutar, SRS olaylarına yapay cevap eklemez. Replikten kelime yakalama saf kişisel deste işlemlerini ve kaynak snapshotını kullanır.
+
+`backup-schema.js`, dosya ve sunucu için ortak alan/boyut/kimlik/HTML güvenlik sınırıdır. `backup-data.js` kalıcı alanları projekte eder, eski snapshotların yokluğunu kayıt silme saymadan üçlü birleşim yapar. Aynı cevap ID’si tek kez sayılır, tekrar sayaçları/tarihleri birleşik olay sırasından hesaplanır. Aynı alanın iki bağımsız düzenlemesi tercih gerektirir; kişisel kaldırmalar tombstone olarak kalır. Yinelenen kelimeler tercih sonrası aktif/kaldırılmış olarak korunur. Nota özel değişiklik tekrar vadesini sıfırlamaz. JSON uygulaması mevcut yerel revision üzerinde CAS ile yapılır ve öncesi kurtarma kopyası tutulur.
+
+`worker/sync.js` yalnız Sites tarafından doğrulanan `oai-authenticated-user-id` kimliğiyle GET/PUT kabul eder. E-posta veya istemciden gönderilen kullanıcı kimliği kullanılmaz. D1 sorguları kullanıcıya bağlı parametrelerle çalışır; PUT aynı origin ve JSON ister. `yomu_sync` satırındaki revision koşullu INSERT/UPDATE ile atomik artırılır, eski revision 409 alır. Request içinde DDL çalışmaz. `db/schema.ts` ve `npm run db:generate` ile üretilmiş `drizzle/` migrationları commit edilir; Sites yayın öncesi uygular. Manifest mantıksal `d1: DB` bağını bildirir; veritabanı kimliği/erişim anahtarı kaynakta yoktur.
+
+`data-feature.js` ilk bağlantıda önizleme/onay, sonra gecikmeli yerel değişiklik ve görünür uygulamada 30 saniyelik kontrol kullanır. Yerel revision, ağ ve metadata await noktaları boyunca tekrar denetlenir. Bulut base ancak gelen kayıtlar yerel CAS ile uygulandıktan sonra kabul edilir; eşzamanlı cevap gelirse yeni önizleme/yeniden deneme yapılır. Base/tercih ve kurtarma kopyası ayrı IndexedDB metadata anahtarlarındadır, buluta gönderilmez. Aktif turlar ve yazı taslakları varken gelen birleşim ertelenir. Geri yükleme eşitlemeyi duraklatır. Worker çıktısı yalnız izinli tarayıcı dosyalarını ve sunucu kodunu içerir; QA kimliği, saat/ses taklitleri ve kişisel QA dosyaları pakete girmez.
+
+Tek D1 satırının boyut sınırı altında kalmak için bulut snapshotı 1,8 MB ile sınırlıdır; JSON içe aktarma 8 MB sınırındadır. Bu sınırlar UI’da açıklanır. [D1 prepared statements](https://developers.cloudflare.com/d1/worker-api/prepared-statements/), [D1 limits](https://developers.cloudflare.com/d1/platform/limits/).
+
 ## 0.8 · Kişisel desteler, zorlanma geçmişi ve dinleme
 
 personal-data.js döngüsüz doğrulama/CSV/soru çözümleme/snapshot mantığını; personal-feature.js sayfa ve olay denetimlerini taşır. Kişisel sorular personal:<uuid>:<mode>, öğeler personal-<uuid> kimliğiyle kalır. Düzenlemelerde revision/soru içerik sürümü değişir; eski cevap olayları korunur, mevcut kişisel tekrarlar yeni içerik için yeniden vadesi gelmiş yapılır. Kelime kaldırma tombstone + beceri kartlarının suspension bilgisiyle geri alınabilir; uygulama çözülemeyen soruları tekrar kuyruğuna başlatmaz.

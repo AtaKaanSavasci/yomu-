@@ -106,3 +106,4 @@ summary:focus-visible{outline:3px solid #9c7028;outline-offset:-4px;border-radiu
 }
 @media(prefers-reduced-motion:reduce){.training-launch{transition:none}}
 @media print{.workspace-navigation{display:none!important}}
+@media(max-width:700px){.sidebar nav .nav-link[href="#genki"],.sidebar nav .nav-link[href="#exams"]{display:none}}

@@ -1,4 +1,5 @@
 import {translate,TranslationError} from '../scripts/translation-core.mjs';
+import {syncRequest} from './sync.js';
 
 const responseHeaders={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
 const json=(status,body)=>new Response(JSON.stringify(body),{status,headers:{...responseHeaders,'Content-Type':'application/json; charset=utf-8'}});
@@ -20,8 +21,9 @@ async function translationRequest(request,translateImpl) {
  finally{reader?.releaseLock();}
 }
 export function createHostedApp(assets,translateImpl=translate) {
- return {async fetch(request){
+ return {async fetch(request,env){
   const url=new URL(request.url);
+  if(url.pathname==='/api/sync')return syncRequest(request,env);
   if(url.pathname==='/api/translate')return translationRequest(request,translateImpl);
   if(!['GET','HEAD'].includes(request.method))return new Response('Method not allowed',{status:405,headers:responseHeaders});
   let path;try{path=decodeURIComponent(url.pathname);}catch{return new Response('Not found',{status:404,headers:responseHeaders});}

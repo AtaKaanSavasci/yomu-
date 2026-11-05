@@ -38,6 +38,7 @@ export function upsertPersonalWord(state,draft,{id=crypto.randomUUID(),now}={}){
  const wordId=previous?.id||id;if(p.words.some(word=>word.id!==previous?.id&&word.id===wordId))fail('duplicate-id','written');
  if(p.words.some(word=>active(word)&&word.id!==wordId&&identity(word.deckId,word.written,word.reading)===identity(deckId,values.written,values.reading)))fail('duplicate-word','written');
  const stamp=dateString(now),word={...values,id:wordId,deckId,revision:(previous?.revision||0)+1,createdAt:previous?.createdAt||stamp,updatedAt:stamp,editorReviewed:false};
+ if(previous?.sourceSnapshot)word.sourceSnapshot=structuredClone(previous.sourceSnapshot);
  const changed=previous&&JSON.stringify([previous.written,previous.reading,previous.meaning])!==JSON.stringify([word.written,word.reading,word.meaning]);
  if(previous)p.words[p.words.indexOf(previous)]=word;else p.words.push(word);
  if(changed)for(const card of Object.values(next.skillStates||{}))if(card.itemId===`personal-${wordId}`){card.step=-1;card.dueAt=stamp;card.source='personal-edit';}
