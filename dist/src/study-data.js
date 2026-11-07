@@ -1,7 +1,8 @@
 // Original, AI-assisted starter content. Level labels are editorial study bands,
 // not official JLPT vocabulary/grammar lists. No human-editor approval.
 import {additionalWordRows,additionalSentenceRows,additionalGrammarRows} from './study-expansion.js';
-export const STUDY_VERSION='study-2026-10-31.2';
+import {novemberWordRows} from './vocabulary-november.js';
+export const STUDY_VERSION='study-2026-11-07.1';
 export const studyLevels=['N5','N4','N3','N2','N1'];
 export const wordTopics=[{id:'fruits',ja:'果物',tr:'Meyveler',en:'Fruit',note:{tr:'Meyveler ve ilgili tarım/gıda sözcükleri.',en:'Fruit and related agriculture/food words.'}},{id:'objects',ja:'物',tr:'Eşyalar',en:'Objects'},{id:'software',ja:'ソフトウェア',tr:'Yazılım',en:'Software',note:{tr:'Alan terimleri; JLPT müfredatı oldukları iddia edilmez.',en:'Domain terms; not claimed to be JLPT syllabus items.'}}];
 export const sentenceScenes=[{id:'restaurant',ja:'レストラン',tr:'Restoranda',en:'Restaurant'},{id:'daily',ja:'日常',tr:'Günlük hayat',en:'Daily life'},{id:'work',ja:'職場',tr:'İş yerinde',en:'Workplace'},{id:'friends',ja:'友達',tr:'Arkadaş arası',en:'With friends'}];
@@ -75,7 +76,7 @@ const wordRows=[
  ['N1','software','redundancy','冗長化','じょうちょうか','yedekli yapılandırma','redundancy','障害に備えてサーバーを冗長化します。','しょうがいに そなえて サーバーを じょうちょうかします。','Arızaya karşı sunucuları yedekli yapılandırırız.','We configure redundant servers in preparation for failures.'],
  ['N1','software','latency','遅延','ちえん','gecikme','latency','応答の遅延を最小限に抑えます。','おうとうの ちえんを さいしょうげんに おさえます。','Yanıt gecikmesini en aza indiririz.','We minimize response latency.'],
 ];
-export const studyWords=[...wordRows,...additionalWordRows].map(([level,category,key,written,reading,tr,en,ja,kana,exampleTr,exampleEn])=>({id:`w-${key}`,level,category,written,reading,meaning:bi(tr,en),example:{ja,reading:kana,translation:bi(exampleTr,exampleEn)},version:STUDY_VERSION,editorReviewed:false,technical:category==='software',meaningAlternatives:{tr:[],en:[]},writtenAlternatives:[]}));
+export const studyWords=[...wordRows,...additionalWordRows,...novemberWordRows].map(([level,category,key,written,reading,tr,en,ja,kana,exampleTr,exampleEn])=>({id:`w-${key}`,level,category,written,reading,meaning:bi(tr,en),example:{ja,reading:kana,translation:bi(exampleTr,exampleEn)},version:STUDY_VERSION,editorReviewed:false,technical:category==='software',meaningAlternatives:{tr:[],en:[]},writtenAlternatives:[]}));
 const variants={apple:{written:['林檎','リンゴ']},strawberry:{written:['苺','イチゴ']},banana:{written:['ばなな']},grape:{written:['葡萄','ブドウ'],en:['grape']},pear:{tr:['armut'],en:['pear']},watermelon:{written:['西瓜','スイカ']},desk:{tr:['masa']},peel:{tr:['meyve kabuğu']},seed:{tr:['çekirdek']},bug:{tr:['hata','bug'],en:['software bug']},function:{tr:['işlev']},dependency:{tr:['bağımlılık','bağımlılıklar'],en:['dependencies']}};
 for(const w of studyWords){const v=variants[w.id.slice(2)];if(v){w.writtenAlternatives=v.written || [];w.meaningAlternatives={tr:v.tr || [],en:v.en || []};}}
 

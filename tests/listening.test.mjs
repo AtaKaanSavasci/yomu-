@@ -23,7 +23,7 @@ test('dictation accepts hiragana, katakana and halfwidth kana while rejecting ro
 });
 test('source filters constrain round snapshots and starting a round never manufactures an answer',()=>{
  const state=freshState(),config={...defaultListening(),level:'N3',category:'software'};const s=createListeningSession(state,config,()=>0.25,'round-one');
- assert.equal(s.questions.length,8);assert.equal(new Set(s.ids).size,s.ids.length);assert.equal(state.events.length,0);
+ assert.equal(s.questions.length,10);assert.equal(new Set(s.ids).size,s.ids.length);assert.equal(state.events.length,0);
  assert.ok(filterListeningWords(state,config).every(word=>word.level==='N3'&&word.category==='software'));
  assert.equal(createListeningSession(state,{...config,source:'personal'}),null);
  state.listening.session=s;const hydrated=hydrateState(state);assert.deepEqual(hydrated.listening.session.questions,s.questions);

@@ -1,6 +1,12 @@
 # Yomu · Japonca çalışma alanı
 
-**0.9.0 · 5 Kasım 2026** — Cihazlar arası eşitleme, JSON yedeğini geri yükleme, Genki çalışma yolu, replikten desteye kelime ve N5–N1 süreli denemeler.
+**0.9.1 · Kelime havuzu genişletmesi** — 100 yeni kelime; toplam 300 kelime, 120 cümle ve 50 gramer konusu.
+
+## 0.9.1 · Daha fazla kelime
+
+Mevcut yedi başlık ve N5–N1 çalışma bantlarının her birine yeni kelimeler eklendi. Her düzeyde 60 kelime vardır: meyveler, eşyalar ve yazılım başlıklarında düzey başına 12; aile/insanlar, yiyecek/içecek, zaman/planlar ve ulaşım/seyahatte 6 kelime. Yeni kelimelerde açık kana okunuşu, TR/EN anlam ve örnek cümle çevirileri bulunur. Kelime pratikleri ve dinleme havuzu aynı kayıtlardan yararlanır. Önceki 200 kelimenin kimlikleri ve içeriği korunur; aktif turlar kendi snapshotlarıyla devam eder.
+
+Yeni 100 yazım/okunuş çifti JMdict ile karşılaştırıldı. Örnekler özgün çalışma materyalidir; düzeyler yaklaşık bantlardır. [Kaynaklar, kapsam ve atıf](docs/sources-v091.md). 156/156 test başarılı.
 
 ## 0.9 · Kitabın, destelerin ve cihazların birlikte
 

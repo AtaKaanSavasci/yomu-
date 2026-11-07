@@ -1,4 +1,14 @@
-# Doğrulama kaydı · 5 Kasım 2026
+# Doğrulama kaydı · 8 Kasım 2026
+
+## 0.9.1 · 100 yeni kelime
+
+Toplam kelime sayısı 200 → 300. Mevcut seviye/konu kapsamı testleri 300 kayda güncellendi; bütün kelimeler üç soru türü ve iki dilde cevap/tek doğru seçenek kontrollerinden, iki dinleme modu için de havuz/cevap kontrollerinden geçer. 156/156 test, JavaScript sözdizimi kontrolü ve 56 tarayıcı dosyalı Worker derlemesi başarılı.
+
+Repo dışındaki doğrulama aracı, JMdict English 2026-11-07 snapshotında yeni 100 yazım/kana çiftinin tamamını buldu; okunuşun ilgili yazıma ait olmasını sınırlayan re_restr alanları kontrol edildi. Önceki 200 kaydın kimlik/sıra/içerik eşitliği, içerik sürümü alanı dışında doğrudan eski snapshotla karşılaştırıldı. [Sözlük kaynağı, kapsam ve atıf](sources-v091.md).
+
+Gerçek uygulama içi tarayıcıda ayrı yerel 4188 adresi: paket 300 kelime gösterdi; N5 meyve seçkisinde 12 içerik ve yeni 果物/オレンジ/ジャム/ジュース kartları görüldü. N2 Yazılım başlığında yeni 識別子 aranıp しきべつし / tanımlayıcı ve özgün örneği açıldı. Tekrara eklemek iki beceri kartı oluşturdu; okunuş pratiğinde しきべつし doğru kabul edilip yalnız okunuş kartının vadesi değişti. 390 piksel mobilde belge 375 piksel genişlikte kaldı; kart/örnek satırları taşmadı. Kaynaklar sayfasında yeni JMdict atfı görüldü, konsol temizdi. Test sekmesi, geçici viewport ve sahip olunan sunucu kapatıldı.
+
+Bu içerik genişletmesinde gerçek Japonca ses çıkışı veya fiziksel telefon denenmedi; yeni kelimelerin dinleme havuzunda bulunması otomatik kontrollerle doğrulandı. Örnek cümle ve çeviriler özgün yardımcı materyaldir, insan editörü onayı iddia edilmez.
 
 ## 0.9 · Eşitleme, yedek, Genki, replik ve denemeler
 
