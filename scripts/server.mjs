@@ -6,11 +6,17 @@ import { spawn } from 'node:child_process';
 import {handleTranslation} from './translation.mjs';
 const root = fileURLToPath(new URL('../dist/', import.meta.url));
 const port = Number(process.env.PORT || 4173);
+const hosted=process.argv.includes('--hosted')?(await import('../dist/server/index.js')).default:null;
 const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.webmanifest':'application/manifest+json; charset=utf-8' };
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://localhost');
     if(url.pathname==='/api/translate'){await handleTranslation(req,res);return;}
+    if(hosted){
+      const response=await hosted.fetch(new Request(url,{method:req.method,headers:req.headers}));
+      res.writeHead(response.status,Object.fromEntries(response.headers));
+      res.end(Buffer.from(await response.arrayBuffer()));return;
+    }
     if(!['GET','HEAD'].includes(req.method)){res.writeHead(405).end();return;}
     const path = resolve(root, '.' + decodeURIComponent(url.pathname === '/' ? '/index.html' : url.pathname));
     if (!path.startsWith(root.endsWith(sep) ? root : root + sep)) { res.writeHead(403).end(); return; }

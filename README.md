@@ -1,6 +1,14 @@
 # Yomu · Japonca çalışma alanı
 
-**0.9.1 · Kelime havuzu genişletmesi** — 100 yeni kelime; toplam 300 kelime, 120 cümle ve 50 gramer konusu.
+**0.9.2 · Daha hafif açılış** — Tek JavaScript/stil paketi, önceden gzip sıkıştırma ve sürüme bağlı tarayıcı önbelleği. 300 kelime, 120 cümle ve 50 gramer konusu korunur.
+
+## 0.9.2 · Açılış performansı
+
+Yayımlanan sürümde HTML + JavaScript + CSS için 53 istek yerine 3 istek yapılır (favicon/manifest ve sonradan istenen API/kanji/video verileri hariç). Esbuild, tarayıcı modüllerini birleştirip JavaScript/CSS boyutunu küçültür; CSS sırası korunur. Derleme anında gzip hazırlanır, kullanıcı isteğinde tekrar sıkıştırılmaz. Temel dosyalar 708.254 bayt sıkıştırılmamış kaynaktan 204.292 bayt gzip aktarımına iner. Bu, dosya boyutu karşılaştırmasıdır; gerçek telefonda açılış süresi ölçümü değildir.
+
+İçerik karması taşıyan JS/CSS adresleri yalnızca tarayıcıda uzun süre önbelleklenir. HTML, manifest ve bildirim servis çalışanı her açılışta ETag ile yeniden doğrulanır; yeni sürüm yeni paket adreslerini getirir. Çeviri/eşitleme yanıtları önbelleğe alınmaz. Tam çevrimdışı çalışma eklenmez. Worker yalnızca sıkıştırılmış dosyaları gömer; paket 742.561 → 296.330 bayta iner. [Doğrulama kaydı](docs/qa.md).
+
+`npm run build:hosted` üretim paketini ve `dist/server/build-report.json` boyut raporunu üretir. `node scripts/server.mjs --hosted` aynı Worker çıktısını yerelde denemek içindir; normal `npm run dev` okunabilir kaynak dosyalarını kullanmaya devam eder. 160/160 test başarılı.
 
 ## 0.9.1 · Daha fazla kelime
 

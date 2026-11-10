@@ -1,4 +1,14 @@
-# Doğrulama kaydı · 8 Kasım 2026
+# Doğrulama kaydı · 10 Kasım 2026
+
+## 0.9.2 · Açılış performansı
+
+160/160 test ve JavaScript sözdizimi kontrolleri başarılı. Yeni kontroller, gerçek üretim derlemesinin tek JS/tek CSS ile başladığını, içerik karmalı URL'leri, gzip/identity eşitliğini, 220 KB başlangıç aktarım bütçesini, deterministik derlemeyi, gzip q=0 ve wildcard davranışını, HEAD/304 yanıtlarını ve HTML/servis çalışanının yeniden doğrulanmasını kapsar. API doğrulaması ve eşitleme kullanıcı ayrımı testleri de geçer.
+
+Derleme raporu: HTML + 39 modül + 13 stil dosyası = 53 temel istek; yeni HTML + tek JS + tek CSS = 3. Ham kaynak 708.254 bayt, küçültülmüş içerik 621.279 bayt, gzip aktarımı 204.292 bayt (HTML 562, JS 181.116, CSS 22.614). Favicon/manifest, isteğe bağlı API/kanji/video istekleri bu toplamın dışında. Worker dosyası önceki sürümdeki 742.561 bayttan 296.330 bayta düşer. Eski üretimin gerçek ağ sıkıştırması veya fiziksel telefondaki süre ölçülmedi; %71 fark yalnızca ham kaynak ile yeni gzip toplamının karşılaştırmasıdır.
+
+Aynı Worker çıktısı yerel 4188 sunucusunda HTTP üzerinden denendi: üç yanıtta da Content-Encoding: gzip, geçerli gzip gövdesi ve toplam 204.292 bayt; ETag ile koşullu üç istek 304 ve boş gövde döndürdü. İçerik karmalı JS/CSS private/immutable, HTML private/no-cache başlıklarını taşıdı. Kullanıcıya ait API verileri için no-store korunur.
+
+Gerçek uygulama içi tarayıcıda paketlenmiş 0.9.2 ana sayfası, 300 kelimelik havuz, önceki N2/Yazılım/識別子 seçimi, hiragana tablosu ve gramer ekranı açıldı. 識別子 okunuş pratiğinde しきべつし doğru kaydedildi; yenilemede aynı cevap ve önceki kayıtlar korundu. Dar ekranda minify edilmiş CSS görünümü kontrol edildi; konsolda hata/uyarı yoktu. Kanıt görüntüsü repo dışında yomu-v092-startup.png olarak kaydedildi. Geçici sekme kapatıldı. Gerçek açılış süresi için tarayıcı Performance API bu denetim yüzeyinde kullanılamadı; saniye bazlı hızlanma iddiası yoktur.
 
 ## 0.9.1 · 100 yeni kelime
 

@@ -1,5 +1,12 @@
 # Mimari ve tekrar kararı · 30 Ekim 2026
 
+## 0.9.2 · Üretim açılış paketi
+
+Kaynak ES modülleri ve stil dosyaları okunabilir halde kalır. build-hosted.mjs, esbuild ile tarayıcı grafiğini bir ESM dosyasına, HTML'deki sırayı koruyan CSS grafiğini tek stile dönüştürür. SHA-256 içerik karmaları paket URL'lerinin parçasıdır. HTML bu URL'leri kullanır; üretim Worker'ı ham /src modüllerini sunmaz. Node geliştirme sunucusunun --hosted seçeneği üretilmiş Worker'ı yerelde çalıştırır.
+
+Gzip derleme anında hazırlanıp base64 olarak gömülür; Worker'da büyük ham metnin ikinci kopyası tutulmaz. Accept-Encoding gzip kabul ediyorsa baytlar encodeBody: manual ile aynen gönderilir. Gzip istemeyen istemciye DecompressionStream ile identity gövde sunulur. ETag aynı içeriğin kodlamaları arasında zayıf doğrulayıcıdır. HEAD gövdesiz, eşleşen If-None-Match 304'tür. İçerik karmalı paketler private/immutable; HTML, manifest ve reminders-sw.js private/no-cache kullanır. API yanıtları no-store kalır. Tarayıcı önbelleği uygulamaya ait kişisel verileri veya bulut API yanıtlarını içermez; yeni offline/service-worker cache katmanı yoktur.
+
+
 ## 0.9 · Kalıcı bulut kaydı ve kitap/deneme alanları
 
 Yerel state şema 3 / IndexedDB sürümü 1 korunur. Genki ve deneme varsayılanları eklenir; deneme snapshotları `exam-schema.js` ile doğrulanır. Genki mini cevapları standart olay modelini kullanır; seviye denemeleri kendi sonuç geçmişini tutar, SRS olaylarına yapay cevap eklemez. Replikten kelime yakalama saf kişisel deste işlemlerini ve kaynak snapshotını kullanır.

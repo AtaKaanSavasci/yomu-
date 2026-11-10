@@ -30,7 +30,21 @@ export function createHostedApp(assets,translateImpl=translate) {
   if(path==='/')path='/index.html';
   const asset=Object.hasOwn(assets,path)?assets[path]:null;
   if(!asset)return new Response('Not found',{status:404,headers:responseHeaders});
-  return new Response(request.method==='HEAD'?null:asset.body,{headers:{...responseHeaders,'Content-Type':asset.type,'Cache-Control':'no-cache'}});
+  const headers={...responseHeaders,'Content-Type':asset.type,'Cache-Control':asset.immutable?'private, max-age=31536000, immutable':'private, no-cache',Vary:'Accept-Encoding',...(asset.etag?{ETag:asset.etag}:{})};
+  const matches=request.headers.get('If-None-Match')?.split(',').map(tag=>tag.trim().replace(/^W\//,''));
+  if(asset.etag&&matches?.some(tag=>tag==='*'||tag===asset.etag.replace(/^W\//,'')))return new Response(null,{status:304,headers});
+  const encodings=(request.headers.get('Accept-Encoding')||'').toLowerCase().split(',').map(part=>part.trim().split(';').map(value=>value.trim()));
+  const gzip=encodings.find(([name])=>name==='gzip')||encodings.find(([name])=>name==='*');
+  const quality=gzip?.slice(1).find(part=>part.startsWith('q='));
+  const compressed=!!asset.gzip&&!!gzip&&(!quality||Number(quality.slice(2))>0);
+  if(compressed)headers['Content-Encoding']='gzip';
+  let body=null;
+  if(request.method!=='HEAD'){
+   if(asset.gzip){const bytes=Uint8Array.from(atob(asset.gzip),char=>char.charCodeAt(0));body=compressed?bytes:new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));}
+   else body=asset.body;
+  }
+  // Cloudflare must send build-time gzip bytes unchanged, without a second compression pass.
+  return new Response(body,{headers,encodeBody:'manual'});
  }};
 }
 // The deterministic build embeds only the browser app's allowlisted source assets.
