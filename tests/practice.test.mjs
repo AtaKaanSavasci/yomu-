@@ -9,8 +9,8 @@ test('each kana chart has 46 basic, 25 voiced and 33 contracted entries',()=>{
  const keys=kanaGroups.flatMap(g=>g.entries.map(e=>e.key));assert.equal(new Set(keys).size,104);
 });
 test('expanded kanji pool has unique word identities and cumulative levels without replacing old cards',()=>{
- assert.equal(new Set(kanjiWords.map(w=>w.key)).size,50);
- for(const [level,size] of [['beginner',18],['intermediate',34],['advanced',50]])assert.equal(characterPool({...defaultPractice(),script:'kanji',level}).length,size);
+ assert.equal(new Set(kanjiWords.map(w=>w.key)).size,65);
+ for(const [level,size] of [['beginner',23],['intermediate',44],['advanced',65]])assert.equal(characterPool({...defaultPractice(),script:'kanji',level}).length,size);
  for(const w of kanjiWords){assert.ok(w.word.includes(w.glyph));assert.ok(w.kana&&w.roman&&w.meaning.tr&&w.meaning.en);}
  for(const id of ['character:reading:kanji-sun','character:writing:kanji-school','character:choice:kanji-word'])assert.equal(getQuestion(id).id,id);
 });
@@ -21,7 +21,7 @@ test('selected rows, difficulty and script constrain the random question pool',(
  config.level='advanced';assert.equal(characterPool(config).length,104);
  config.script='katakana';assert.equal(characterPool(config).find(e=>e.key==='sha').display,'シャ');
  config.groups=[];assert.throws(()=>createCharacterSession(config),/EMPTY_POOL/);
- config.script='kanji';assert.equal(characterPool(config).length,50);
+ config.script='kanji';assert.equal(characterPool(config).length,65);
 });
 test('every generated question resolves from review IDs and has valid choices',()=>{
  for(const script of ['hiragana','katakana','kanji'])for(const mode of ['reading','choice','writing']){

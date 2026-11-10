@@ -1,4 +1,16 @@
-# Doğrulama kaydı · 10 Kasım 2026
+# Doğrulama kaydı · 11 Kasım 2026
+
+## 0.9.4 · Her seviyeye yeni çalışma içeriği
+
+70 kelime (her N5–N1 bandına 14), 15 gramer konusu (her banda 3) ve 15 kanji bağlam kelimesi (başlangıç/orta/zora 5'er) eklendi. Toplam 370 kelime, 120 cümle, 65 gramer konusu ve 65 kanji kelime kartı. Başlangıç/orta/zor kanji havuzları kümülatif 23/44/65. Kana tabloları aynı kalır. [Kaynak ve kapsam](sources-v094.md).
+
+Yeni 85 kelime/kanji kaydının tüm yazım-kana çiftleri, okunuş kısıtları korunarak JMdict 2026-11-07 snapshotında bulundu. Seçilen çalışma anlamları sözlük anlamlarıyla karşılaştırıldı; örnekler özgün hazırlandı. Önceki sürümden alınmış repo dışı snapshotla ilk 300 kelime, 50 gramer ve 50 kanji kaydının kimlik/sıra/içerik eşitliği doğrulandı; yalnız paket sürümleri değişti. Şema veya veritabanı göçü yok.
+
+160/160 test ve sözdizimi kontrolleri başarılı. Mevcut kapsam döngüleri artık 370 kelimenin anlam/okunuş/yazım ve iki dinleme modunu, 65 gramerin hedef/cevaplarını, 65 kanji kelimesinin üç soru türünü iki dilde denetler. Seviye/konu sayıları, tek doğru seçenek, karışık kana, eski ID'lerin çözülmesi, kayıt/tekrar ve oturum snapshotları kontrol edilir. Başlangıç aktarımı 3 temel istek ve 217.420 bayt gzip; 220 KB bütçesi korunur.
+
+Gerçek tarayıcıda ana sayfa 370/65 saydı. N2 yazılımda yeni 圧縮 → あっしゅく / sıkıştırma ve örneği açıldı; tekrara ekleme iki beceri kartı oluşturdu, kana cevabı doğru kaydedildi. N5 gramer listesi 13 konu ve yeni üç başlığı gösterdi. N1 に即して kaydedilip kana varyantı にそくして ile cevaplandı; yenilemede geri bildirim korundu. Kanji ekranında 23/44/65 sayıları doğrulandı; başlangıçta 10 soruluk normal otomatik ilerleme turu tamamlandı. Bu rastgele turda eski kartlar çıktı; yeni 15 kartın tüm soru çözümlemeleri otomatik testte denetlendi.
+
+375 piksel mobilde yeni N1 gramer kartı, uzun açıklama, örnek ve kana gizle/göster kontrol edildi; belge ve kaydırma genişliği 360 piksel, yatay taşma yok. Kaynaklar ekranındaki yeni sözlük sayıları ve gramer bağlantıları görüldü. Konsolda hata/uyarı yoktu. Kanıt görüntüsü repo dışında `yomu-v094-grammar-mobile.png`; geçici sekme/viewport kapatıldı. Japonca cihaz sesi bulunmadığından gerçek ses çıkışı veya fiziksel telefon testi iddia edilmez.
 
 ## 0.9.3 · Her ekranda çeviri baloncuğu
 

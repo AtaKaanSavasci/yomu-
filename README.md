@@ -5,7 +5,7 @@ A Japanese learning app for short, regular practice on your phone or desktop. Av
 ## Main features
 
 - **Kana and kanji practice** — Choose the characters you want to study and practice their readings or Japanese spelling.
-- **Vocabulary, sentences and grammar** — Explore 300 words, 120 everyday sentences and 50 grammar topics, organized into N5–N1 study levels.
+- **Vocabulary, sentences and grammar** — Explore 370 words, 120 everyday sentences and 65 grammar topics, organized into N5–N1 study levels.
 - **Reading and listening** — Read short texts with furigana, reveal readings when needed and practice with your device's Japanese voice.
 - **Anime practice** — Learn with short quotes from Naruto, Bleach, Vinland Saga and Jujutsu Kaisen, with source clips and words you can save to decks.
 - **Personal decks** — Add your own vocabulary, organize it into decks and import or export CSV files.
