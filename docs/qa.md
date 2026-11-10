@@ -1,5 +1,13 @@
 # Doğrulama kaydı · 10 Kasım 2026
 
+## 0.9.3 · Her ekranda çeviri baloncuğu
+
+Sabit çeviri düğmesi uygulama sayfalarını yeniden çizen alanın dışında tutulur. Türkçe/İngilizce etiketi güncellenir; native dialog, erişilebilir ad, açılma durumu ve kapatınca odağın düğmeye dönmesi korunur. Üst menüdeki eski düğme ve ona ait CSS kaldırıldı. Mobilde alt menü ve safe-area için boşluk ayrılır; sayfa sonu ve kaydırma boşluğu sabit düğmeye göre ayarlandı. Çeviri paneli açıkken arka plandaki alıştırmanın sayı kısayolları çalışmaz.
+
+160/160 mevcut test, JavaScript kontrolü ve son CSS düzenlemesinden sonra üretim paketi/boyut/deterministik derleme testleri başarılı. Gerçek tarayıcıda ana sayfa ve kelime ekranından panel açma, tıklama/Enter ile açılış, Escape/kapat düğmesi, odağın geri gelmesi, dil değişimi, taslak/sonuç koruma ve alıştırmada yazılmış `しき` cevabının panel açıp kapatınca kaybolmaması doğrulandı. Gerçek Japonca → İngilizce isteği `こんにちは` için `Hi` döndürdü. Bu kontrol genel çeviri doğruluğu ölçümü değildir.
+
+375×812 görünümde düğme kaydırma öncesi/sonrası aynı konumda kaldı: alt kenarı 716, alt menünün üstü 736 piksel; arada 20 piksel boşluk vardı. 320 piksel normal ve İngilizce büyük yazıda yatay taşma görülmedi; yatay 812×375 görünümde panel kaydırılabilir, kapat düğmesi erişilebilir kaldı. 1280×900 masaüstü konumu da kontrol edildi. Konsolda hata/uyarı yoktu. Fiziksel telefon/ekran okuyucu testi yapılmadı. Repo dışındaki kanıt görüntüsü `yomu-v093-translation-bubble.png`; geçici sekme ve viewport kapatıldı.
+
 ## 0.9.2 · Açılış performansı
 
 160/160 test ve JavaScript sözdizimi kontrolleri başarılı. Yeni kontroller, gerçek üretim derlemesinin tek JS/tek CSS ile başladığını, içerik karmalı URL'leri, gzip/identity eşitliğini, 220 KB başlangıç aktarım bütçesini, deterministik derlemeyi, gzip q=0 ve wildcard davranışını, HEAD/304 yanıtlarını ve HTML/servis çalışanının yeniden doğrulanmasını kapsar. API doğrulaması ve eşitleme kullanıcı ayrımı testleri de geçer.

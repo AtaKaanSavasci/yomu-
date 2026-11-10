@@ -11,7 +11,7 @@ A Japanese learning app for short, regular practice on your phone or desktop. Av
 - **Personal decks** — Add your own vocabulary, organize it into decks and import or export CSV files.
 - **Reviews and progress** — Revisit saved words, practice mistakes and track your answers over time.
 - **Study paths and quizzes** — Follow original Genki I & II study guides or try timed level quizzes.
-- **Translation** — Translate between Japanese, Turkish and English.
+- **Translation** — Open the floating translation button from any screen to translate between Japanese, Turkish and English.
 - **Backups and sync** — Export or restore JSON backups and optionally sync your study data across devices on the hosted app.
 
 Levels are approximate study guides, not official JLPT certification. Listening needs a Japanese voice on your device; translation, clips and cloud sync need internet access.

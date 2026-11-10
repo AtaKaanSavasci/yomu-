@@ -26,6 +26,10 @@
 <body>
   <a class="skip-link" href="#main">İçeriğe geç / Skip to content</a>
   <div id="app"><p class="loading">Yomu · 読む</p></div>
+  <button id="translation-launcher" class="translation-launcher" type="button" data-action="open-translation" aria-label="Çeviri masasını aç" aria-haspopup="dialog" aria-controls="dialog" aria-expanded="false" hidden>
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 6 0M8 5v3c0 4-2 7-6 9m2-6c1 3 4 5 7 6M13 20l4-10 4 10m-6.5-4h5"/></svg>
+    <span>Çevir</span>
+  </button>
   <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>
   <div id="toast" role="status" aria-live="polite" hidden></div>
   <dialog id="dialog"></dialog>

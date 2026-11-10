@@ -71,7 +71,6 @@ summary:focus-visible{outline:3px solid #9c7028;outline-offset:-4px;border-radiu
  .language-switch button{min-width:38px;min-height:44px;padding:7px}
  .mobile-settings{min-width:44px;min-height:44px}
  .text-size{min-width:44px;min-height:44px}
- .translator-trigger{min-height:44px}
  .topbar::before{content:'yomu'}
  .date-line{margin-bottom:17px}
  .page-heading{margin:24px 0}
@@ -101,9 +100,33 @@ summary:focus-visible{outline:3px solid #9c7028;outline-offset:-4px;border-radiu
  .topbar::before{width:100%;text-align:center}
  .top-controls{width:100%;justify-content:space-between;margin-left:0}
  .top-controls,.large-text .top-controls{gap:2px}
- .top-controls .translator-trigger{padding:7px;gap:3px;font-size:.65rem}
  .listening-config-wrap>summary{flex-wrap:wrap;gap:8px}
 }
 @media(prefers-reduced-motion:reduce){.training-launch{transition:none}}
 @media print{.workspace-navigation{display:none!important}}
 @media(max-width:700px){.sidebar nav .nav-link[href="#genki"],.sidebar nav .nav-link[href="#exams"]{display:none}}
+
+/* A persistent shortcut; the native dialog keeps the current study screen intact. */
+:root{--translation-nav-offset:0px}
+html{scroll-padding-bottom:calc(var(--translation-nav-offset) + 100px)}
+.translation-launcher{position:fixed;right:max(20px,env(safe-area-inset-right,0px));bottom:calc(var(--translation-nav-offset) + 20px + env(safe-area-inset-bottom,0px));z-index:30;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:12px 20px;border:1px solid var(--green);border-radius:999px;background:var(--green);color:var(--white);box-shadow:0 5px 20px #1d38232b;font-size:.9rem;font-weight:600;line-height:1.4;cursor:pointer;touch-action:manipulation;transition:background-color .15s,box-shadow .15s}
+.translation-launcher[hidden]{display:none}
+.translation-launcher>.icon{width:24px;height:24px;flex-shrink:0}
+.translation-launcher:hover{background:var(--ink);box-shadow:0 7px 24px #1d382340}
+.translation-launcher:active{background:var(--ink);box-shadow:0 2px 8px #1d38232b}
+.translation-launcher:focus-visible{outline:3px solid var(--green);outline-offset:4px}
+.workspace>footer{padding-bottom:100px}
+dialog.translation-dialog{padding:24px;width:min(560px,calc(100% - 32px));max-height:calc(100dvh - 32px);overscroll-behavior:contain}
+.translation-dialog>.close-dialog{position:absolute;top:16px;right:16px;width:44px;height:44px;color:var(--ink)}
+.translation-dialog .translation-container{padding:0;border:0;background:transparent}
+.translation-dialog .section-top{padding-right:44px}
+.translation-dialog .translation-languages select,.translation-dialog .swap-languages,.translation-dialog .translation-bottom .btn{min-height:44px}
+.translation-dialog .translation-container textarea{font-size:1rem}
+@media(max-width:700px){
+ :root{--translation-nav-offset:76px}
+ .translation-launcher{right:max(16px,env(safe-area-inset-right,0px));padding:12px 16px}
+ dialog.translation-dialog{padding:20px;max-height:calc(100dvh - 24px - env(safe-area-inset-bottom,0px))}
+ .translation-dialog>.close-dialog{top:12px;right:12px}
+}
+@media(prefers-reduced-motion:reduce){.translation-launcher{transition:none}}
+@media print{.translation-launcher{display:none!important}.workspace>footer{padding-bottom:24px}}
